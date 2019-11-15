@@ -22,7 +22,7 @@ class _UserSelectorState extends State<UserSelector> {
   }
 
   Future<void> onSubmit(String value) async {
-    User user = await _auth.userProvider.fetchUser(field, value);
+    User user = await _auth.userProvider.fetchUser("gorvenmentId", value);
     Navigator.pop(context, user);
   }
 
@@ -32,7 +32,10 @@ class _UserSelectorState extends State<UserSelector> {
       child: Center(
         child: Column(
           children: <Widget>[
-            DropdownButton<String>(
+            /*  DropdownButton<String>(
+              isExpanded: true,
+              value: field,
+              style: TextStyle(color: Colors.white),
               hint: Text("Search with.."),
               onChanged: (String value) {
                 setState(() {
@@ -54,25 +57,27 @@ class _UserSelectorState extends State<UserSelector> {
                 ),
               ],
             ),
+            */
             TextField(
               controller: _controller,
               onSubmitted: onSubmit,
-              enabled: field != null,
               decoration: InputDecoration(
-                  border: OutlineInputBorder(), hintText: "Search User"),
+                border: OutlineInputBorder(),
+                hintText: "Search User",
+                fillColor: Colors.white,
+                filled: true,
+              ),
             ),
             RaisedButton(
-              child: Text("Search"),
-              onPressed: field!=null ? () {
-                onSubmit(_controller.text);
-              } : null,
-            )
+                child: Text("Search"),
+                onPressed: () {
+                  onSubmit(_controller.text);
+                })
           ],
         ),
       ),
     );
   }
-
   void pickUser() {}
 }
 

@@ -69,6 +69,14 @@ class _PageState extends State<Page> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        if (_auth.state == AuthState.SIGNED_IN) {
+          _auth.state = AuthState.SIGNED_IN;
+        } else if (_auth.state == AuthState.SIGNED_OUT) {
+          _auth.state = AuthState.SIGNED_OUT;
+        }
+        else {
+          
+        }
         return false;
       },
       child: _authState == AuthState.LOADING
