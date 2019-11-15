@@ -4,7 +4,7 @@ import 'package:gsec/providers/base_provider.dart';
 
 class UserProvider extends BaseProvider {
   Future<User> fetchUser(String field, String value) async {
-    DocumentSnapshot shot = (
+    List<DocumentSnapshot> shot = (
       await firestore
             .collection("users")
             .where(

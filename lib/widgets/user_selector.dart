@@ -23,6 +23,7 @@ class _UserSelectorState extends State<UserSelector> {
 
   Future<void> onSubmit(String value) async {
     User user = await _auth.userProvider.fetchUser("gorvenmentId", value);
+
     Navigator.pop(context, user);
   }
 

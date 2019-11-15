@@ -21,7 +21,7 @@ class Auth extends BaseProvider {
   DeviceProvider get deviceProvider => _deviceProvider;
 
   //User provider
-  UserProvider _userProvider;
+  UserProvider _userProvider = new UserProvider();
 
   // current state of the app
   AuthState _state = AuthState.SIGNED_OUT;
@@ -36,6 +36,7 @@ class Auth extends BaseProvider {
 
   set state(AuthState state) {
     _state = state;
+    
     notifyListeners();
   }
 
