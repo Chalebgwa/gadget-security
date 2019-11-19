@@ -53,20 +53,29 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  void showOwnerInfo(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      //barrierDismissible: true,
+      builder: (context) {
+        return UserInfo(
+          user: user,
+        );
+      },
+    );
+  }
+
   void navigateToScanner(BuildContext context) async {
     try {
       barcode = await BarcodeScanner.scan();
       User user = await _auth.GetUserBySsn(barcode);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => UserInfo(
-            user: user,
-          ),
-        ),
-      );
+      if (user != null) {
+        showOwnerInfo(context, user);
+      } else {
+        Fluttertoast.showToast(msg: "User not found");
+      }
     } on Exception {
-      Fluttertoast.showToast(msg: "error");
+      Fluttertoast.showToast(msg: "scanning failed");
     }
   }
 
@@ -77,7 +86,6 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     Auth _auth = Provider.of<Auth>(context);
-    
 
     return Page(
       child: Scaffold(
@@ -87,14 +95,9 @@ class _DashboardState extends State<Dashboard> {
           onPressed: (String value) async {
             User user = await _auth.searchDeviceById(value);
             if (user != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UserInfo(
-                    user: user,
-                  ),
-                ),
-              );
+              showOwnerInfo(context, user);
+            } else {
+              Fluttertoast.showToast(msg: "owner not found");
             }
           },
         ),

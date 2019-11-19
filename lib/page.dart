@@ -75,9 +75,9 @@ class _PageState extends State<Page> {
           _auth.state = AuthState.SIGNED_OUT;
         }
         else {
-          
+
         }
-        return false;
+        return true;
       },
       child: _authState == AuthState.LOADING
           ? LoadingScreen()

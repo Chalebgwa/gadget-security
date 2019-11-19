@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gsec/models/user.dart';
 import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
@@ -23,8 +24,11 @@ class _UserSelectorState extends State<UserSelector> {
 
   Future<void> onSubmit(String value) async {
     User user = await _auth.userProvider.fetchUser("gorvenmentId", value);
-
-    Navigator.pop(context, user);
+    if (user != null) {
+      Navigator.pop(context, user);
+    } else {
+      Fluttertoast.showToast(msg: "User does not exist");
+    }
   }
 
   @override
@@ -79,6 +83,7 @@ class _UserSelectorState extends State<UserSelector> {
       ),
     );
   }
+
   void pickUser() {}
 }
 
