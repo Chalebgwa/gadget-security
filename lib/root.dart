@@ -4,6 +4,8 @@ import 'package:gsec/views/dashboard.dart';
 import 'package:gsec/views/loading_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'fancy_drawer.dart';
+
 class Root extends StatefulWidget {
   Root({Key key}) : super(key: key);
 
@@ -23,13 +25,13 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     switch (_auth.state) {
       case AuthState.SIGNED_OUT:
-        return Dashboard();
+        return FancyDrawer();
       case AuthState.LOADING:
         return LoadingScreen();
       case AuthState.SIGNED_IN:
-        return Dashboard();
+        return FancyDrawer();
       default:
-        return Dashboard();
+        return FancyDrawer();
     }
   }
 }

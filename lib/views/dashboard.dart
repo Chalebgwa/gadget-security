@@ -24,6 +24,9 @@ class _DashboardState extends State<Dashboard> {
   String adId = "ca-app-pub-8858281741870053~7891966146";
   String barcode = '';
   Auth _auth;
+
+  double _width = 0;
+  double _height = 0;
   TextEditingController _controller = new TextEditingController();
   @override
   void initState() {
@@ -89,28 +92,53 @@ class _DashboardState extends State<Dashboard> {
 
     return Page(
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        primary: true,
         backgroundColor: Colors.transparent,
-        floatingActionButton: FancySearch(
-          controller: _controller,
-          onPressed: (String value) async {
-            User user = await _auth.searchDeviceById(value);
-            if (user != null) {
-              showOwnerInfo(context, user);
-            } else {
-              Fluttertoast.showToast(msg: "owner not found");
-            }
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _height = 50;
+              _width = 300;
+            });
           },
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         body: CustomScrollView(
           slivers: <Widget>[
             SliverToBoxAdapter(
-              child: AdmobBanner(
-                adSize: AdmobBannerSize.LARGE_BANNER,
-                adUnitId: BannerAd.testAdUnitId,
-                onBannerCreated: (c) {
-                  print("BANNER CREATED");
-                },
+              child: Container(
+                margin: EdgeInsets.all(10),
+                color: Theme.of(context).primaryColor.withOpacity(.4),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: AdmobBanner(
+                    listener: (AdmobAdEvent e, _) {
+                      if (e == AdmobAdEvent.loaded) {}
+                    },
+                    adSize: AdmobBannerSize.LARGE_BANNER,
+                    adUnitId: BannerAd.testAdUnitId,
+                    onBannerCreated: (c) {},
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: AnimatedContainer(
+                margin: EdgeInsets.all(15),
+                duration: Duration(seconds: 3),
+                curve: Curves.bounceIn,
+                height: _height,
+                width: _width,
+                child: TextField(
+                  decoration: InputDecoration.collapsed(
+                      hintText: 'Search by serial number',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      fillColor: Theme.of(context).primaryColor,
+                      filled: true),
+                ),
               ),
             ),
             SliverGrid.count(
@@ -138,16 +166,18 @@ class _DashboardState extends State<Dashboard> {
                   },
                 ),
                 DashCard(
-                  label: "Advertise",
-                  icon: FontAwesomeIcons.ad,
-                  ontap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Advertiser(),
-                      ),
-                    );
-                  },
+                  label: "Premium",
+                  icon: FontAwesomeIcons.moneyBill,
+                  ontap: true
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Advertiser(),
+                            ),
+                          );
+                        },
                 )
               ],
             ),
@@ -175,7 +205,7 @@ class DashCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        color: Colors.black.withOpacity(0.4),
+        color: Theme.of(context).primaryColor.withOpacity(.4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: InkWell(
           highlightColor: Colors.red,
@@ -188,12 +218,12 @@ class DashCard extends StatelessWidget {
               children: <Widget>[
                 Icon(
                   icon,
-                  color: Colors.white,
+                  color: Theme.of(context).accentColor,
                 ),
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).accentColor,
                   ),
                 ),
               ],

@@ -13,7 +13,12 @@ import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
 
-enum AuthState { SIGNED_IN, SIGNED_OUT, LOADING }
+enum AuthState {
+  SIGNED_IN,
+  SIGNED_OUT,
+  LOADING,
+  SAFE_LOADING,
+}
 
 class Auth extends BaseProvider {
   //Device provider
@@ -36,7 +41,7 @@ class Auth extends BaseProvider {
 
   set state(AuthState state) {
     _state = state;
-    
+
     notifyListeners();
   }
 
@@ -87,6 +92,7 @@ class Auth extends BaseProvider {
   }
 
   Future<String> resetPassword(String email) async {
+    String message;
     try {
       _state = AuthState.LOADING;
       notifyListeners();
@@ -94,13 +100,13 @@ class Auth extends BaseProvider {
 
       firebaseAuth.sendPasswordResetEmail(email: email);
 
-      //message = "OK";
+      message = "Check Your Email";
     } catch (e) {
-      //message = "error";
+      message = "error";
     }
     _state = AuthState.SIGNED_OUT;
     notifyListeners();
-    return "7";
+    return message;
   }
 
   Future<void> signOut() async {
@@ -118,9 +124,9 @@ class Auth extends BaseProvider {
     //the state to return to after loading
     AuthState temp = _state;
     // display looading screen while fetching data
-    _state = AuthState.LOADING;
+    _state = AuthState.SAFE_LOADING;
     notifyListeners();
-    print(identifier);
+    //print(identifier);
     DocumentSnapshot shot = await Firestore.instance
         .collection("devices")
         .document(identifier)
@@ -327,7 +333,7 @@ class Auth extends BaseProvider {
 
   Future<User> GetUserBySsn(String barcode) async {
     AuthState _tempState = _state;
-    _state = AuthState.LOADING;
+    _state = AuthState.SAFE_LOADING;
     notifyListeners();
 
     DocumentSnapshot shot =

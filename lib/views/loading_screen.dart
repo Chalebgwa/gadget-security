@@ -28,8 +28,6 @@ class _LoadingScreenState extends State<LoadingScreen>
     radius = widget.radius;
     dotRadius = widget.dotRadius;
 
-    print(dotRadius);
-
     controller = AnimationController(
       lowerBound: 0.0,
       upperBound: 1.0,
@@ -83,7 +81,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     return Container(
       width: 100.0,
       height: 100.0,
-      //color: Colors.black12,
+      color: Theme.of(context).primaryColor,
       child: new Center(
         child: new RotationTransition(
           turns: animationRotation,
@@ -96,7 +94,7 @@ class _LoadingScreenState extends State<LoadingScreen>
                     offset: Offset(0.0, 0.0),
                     child: Dot(
                       radius: radius,
-                      color: Colors.black12,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                   new Transform.translate(

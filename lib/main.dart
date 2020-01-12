@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gsec/fancy_drawer.dart';
+import 'package:gsec/fancy_theme.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/chat_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
+import 'package:gsec/providers/payment_service.dart';
 import 'package:gsec/providers/settings_provider.dart';
 import 'package:gsec/root.dart';
 import 'package:gsec/views/authentication/authentication.dart';
@@ -20,42 +23,75 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {    
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
-      child: MaterialApp(
-        title: 'Gadget Security',
-        initialRoute: "/",
-        routes: {
-          "/": (context) => Root(),
-          "/auth": (context) => Athentication(),
-          "/scanner": (context) => ScanScreen(),
-          "/donate": (context) => Donate(),
-          "/profile": (context) => Profile(),
-          "/editProfile": (context) => EditProfile(),
-          "/addDevice": (context) => AddDevice(),
-          "/inbox": (context) => Inbox(),
-          "/notifications": (context) => Notifications(),
-          "/settings": (context) => Settings(),
-          "/dashboard":(context) => Dashboard()
-        },
-      ),
+      child: App(),
       providers: <SingleChildCloneableWidget>[
         ChangeNotifierProvider(
-          builder: (BuildContext context) => Auth(),
+          create: (BuildContext context) => PayService(),
         ),
         ChangeNotifierProvider(
-          builder: (BuildContext context) => DeviceProvider(),
+          create: (BuildContext context) => Auth(),
         ),
         ChangeNotifierProvider(
-          builder: (BuildContext context) => SettingsProvider(),
+        create: (BuildContext context) => DeviceProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (BuildContext context) => ChatProvider(),
+          create: (BuildContext context) => SettingsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ChatProvider(),
         ),
       ],
+    );
+  }
+}
+
+class App extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+
+  bool isDarkThemed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isDarkThemed = Provider.of<SettingsProvider>(context).isDarkTheme;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: isDarkThemed ? fancyDarkTheme: fancyLightTheme,
+      title: 'Gadget Security',
+      initialRoute: "/",
+      routes: {
+        "/": (context) => Root(),
+        "/auth": (context) => Athentication(),
+        "/scanner": (context) => ScanScreen(),
+        "/donate": (context) => Donate(),
+        "/profile": (context) => Profile(),
+        "/editProfile": (context) => EditProfile(),
+        "/addDevice": (context) => AddDevice(),
+        "/inbox": (context) => Inbox(),
+        "/notifications": (context) => Notifications(),
+        "/settings": (context) => Settings(),
+        "/dashboard":(context) => Dashboard()
+      },
     );
   }
 }

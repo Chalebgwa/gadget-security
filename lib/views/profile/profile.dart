@@ -40,6 +40,9 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildHomeView(BuildContext context) {
+
+    var theme = Theme.of(context);
+
     return Material(
       type: MaterialType.transparency,
       child: Padding(
@@ -48,7 +51,7 @@ class _ProfileState extends State<Profile> {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.all(10),
-          //color: Colors.black.withOpacity(.4),
+          color: theme.primaryColor.withOpacity(.4),
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
@@ -58,15 +61,30 @@ class _ProfileState extends State<Profile> {
                 Row(
                   children: <Widget>[
                     Expanded(
+                      flex: 1,
                       child: buildUserAvatar(),
                     ),
                     Expanded(
-                      child: Text(
-                        _currentUser?.name ?? "No name",
-                        style: TextStyle(fontSize: 30, color: Colors.white),
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            _currentUser?.name ?? "",
+                            style: TextStyle(fontSize: 30, color: theme.accentColor),
+                          ),
+                          Text(
+                            _currentUser?.surname ?? "",
+                            style: TextStyle(fontSize: 20, color: theme.accentColor),
+                          ),
+                        ],
                       ),
                     ),
                   ],
+                ),
+                Divider(
+                  height: 20,
+                  color: Theme.of(context).accentColor.withOpacity(.6),
                 ),
                 SizedBox(height: 10),
 
@@ -205,12 +223,18 @@ class _ProfileState extends State<Profile> {
         CachedNetworkImage(
           key: Key("myImage"),
           imageBuilder: (context, imageProvider) => CircleAvatar(
-            radius: 40,
-            backgroundImage: imageProvider,
+            radius: 35,
+            backgroundColor: Theme.of(context).primaryColor,
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: imageProvider,
+            ),
           ),
           imageUrl: _currentUser?.imageUrl ??
               "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
-          placeholder: (context, url) => Container(child: CircularProgressIndicator(),),
+          placeholder: (context, url) => Container(
+            child: CircularProgressIndicator(),
+          ),
           errorWidget: (context, url, error) => Icon(Icons.error),
         ),
       ],

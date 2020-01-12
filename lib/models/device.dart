@@ -21,9 +21,20 @@ class Device {
 
   static Map toMap(Device device) {
     return <String,String>{
-      "identifier": device.identifier,
+      "identifier": device.identifier,  
       "ownerId": device.ownerId,
       "name": device.name
     };
   }
+}
+
+enum entityType {
+  MOBILE,
+  VEHICLE,
+  LAPTOPorTV,
+  PC,
+  FRIDGE,
+  CAMERA,
+  RADIO,
+  OTHER
 }

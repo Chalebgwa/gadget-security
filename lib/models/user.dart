@@ -19,9 +19,9 @@ class User {
     String _phone = map["phone"];
     String _city = map["city"];
     String _country = map["country"];
-    String _gorvenmentId = map["gorvernmentId"];
+    String _gorvenmentId = map["gorvenmentId "];
     String _surname = map["surname"];
-    String _image = map["imageUrl"];
+    String _image = map["imageUrl"] ?? "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6";
 
     return User(
         _name, _id, _email, _phone, _city, _country, _gorvenmentId, _surname,_image);

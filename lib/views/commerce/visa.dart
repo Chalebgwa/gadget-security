@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/util/validator.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 class Visa extends StatefulWidget {
   final VoidCallback onBlueClick;
@@ -18,9 +20,11 @@ class Visa extends StatefulWidget {
 }
 
 class _VisaState extends State<Visa> {
-  final TextEditingController _emailController = new TextEditingController();
-  final TextEditingController _resetController = new TextEditingController();
-  final TextEditingController _passwordController = new TextEditingController();
+  final TextEditingController _cardNumberController =
+      new TextEditingController();
+  final TextEditingController _ammountCountroler = new TextEditingController();
+  final TextEditingController _cvvController = new TextEditingController();
+  final TextEditingController _mmyyController = new TextEditingController();
   Auth _auth;
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
@@ -33,40 +37,69 @@ class _VisaState extends State<Visa> {
   @override
   Widget build(BuildContext context) {
     return Page(
-      child: Container(
-        margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-        color: Colors.black.withOpacity(.5),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                buildTextField("card number", _emailController, false,
-                    Validator.validateEmail, FontAwesomeIcons.solidCreditCard),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: buildTextField(
-                          "cvv",
-                          _emailController,
-                          false,
-                          Validator.validateEmail,
-                          FontAwesomeIcons.accessibleIcon),
-                    ),
-                    Expanded(
-                      child: buildTextField("mm/yy", _emailController, false,
-                          Validator.validateEmail, FontAwesomeIcons.calendar),
-                    ),
-                  ],
-                ),
-
-                buildLoginButton(null)
-              ],
+      child: ListView(children: [
+        Container(
+          margin: EdgeInsets.all(10),
+          color: Colors.black.withOpacity(.4),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: AdmobBanner(
+              listener: (AdmobAdEvent e, _) {
+                if (e == AdmobAdEvent.loaded) {}
+              },
+              adSize: AdmobBannerSize.LARGE_BANNER,
+              adUnitId: BannerAd.testAdUnitId,
+              onBannerCreated: (c) {},
             ),
           ),
         ),
-      ),
+        Container(
+          margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          color: Colors.black.withOpacity(.5),
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  buildTextField(
+                    "Ammount",
+                    _ammountCountroler,
+                    false,
+                    Validator.validateEmail,
+                    FontAwesomeIcons.solidCreditCard,
+                  ),
+                  buildTextField(
+                    "card number",
+                    _cardNumberController,
+                    false,
+                    Validator.validateEmail,
+                    FontAwesomeIcons.solidCreditCard,
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: buildTextField(
+                            "cvv",
+                            _cvvController,
+                            false,
+                            Validator.validateEmail,
+                            FontAwesomeIcons.accessibleIcon),
+                      ),
+                      Expanded(
+                        child: buildTextField("mm/yy", _mmyyController, false,
+                            Validator.validateEmail, FontAwesomeIcons.calendar),
+                      ),
+                    ],
+                  ),
+                  buildLoginButton(null)
+                ],
+              ),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 
@@ -80,34 +113,37 @@ class _VisaState extends State<Visa> {
       ),
       onPressed: () {
         showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return SimpleDialog(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Enter you email",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Enter you email",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _resetController,
-                      decoration: InputDecoration(hintText: "email"),
-                    ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _cvvController,
+                    decoration: InputDecoration(hintText: "email"),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                        color: Colors.blue,
-                        child: Text("reset password"),
-                        onPressed: login),
-                  ),
-                ],
-              );
-            });
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RaisedButton(
+                      color: Colors.blue,
+                      child: Text("reset password"),
+                      onPressed: donate),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -116,29 +152,30 @@ class _VisaState extends State<Visa> {
     return Container(
       margin: EdgeInsets.all(20),
       child: RaisedButton(
-          color: Colors.white,
+        color: Colors.white,
+        child: Container(
+          width: double.infinity,
           child: Container(
-            width: double.infinity,
-            child: Container(
-                width: 25, height: 25, child: Center(child: Text("send"))),
+            width: 25,
+            height: 25,
+            child: Center(
+              child: Text("send"),
+            ),
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          onPressed: login),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        onPressed: donate,
+      ),
     );
   }
 
-  void login() async {
-    String email = _emailController.text;
-    String password = _passwordController.text;
-    _auth.signInWithEmail(email, password).then((result) {
-      if (_auth.state == AuthState.SIGNED_IN) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-      }
-    }).then((value) {
-      Navigator.pop(context);
-    });
+  void donate() async {
+    String _ammount = _ammountCountroler.text;
+    String _cardNumber = _cardNumberController.text;
+    String _cvv = _cardNumberController.text;
+    String  _mmyy = _mmyyController.text;
   }
 
   Padding buildTextField(label, controller, isPass, validator, icon) {

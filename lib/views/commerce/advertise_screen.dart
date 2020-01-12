@@ -1,7 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gsec/page.dart';
 
+
+
+@deprecated
 class Advertiser extends StatefulWidget {
   Advertiser({Key key}) : super(key: key);
 
@@ -12,6 +15,22 @@ class _AdvertiserState extends State<Advertiser> {
   Package startup = Package();
   Package premium = Package();
   Package custom = Package();
+  
+
+
+
+  void purchasePackage(Package package){
+    showDialog(
+      context: context,
+      builder: (context)=>SimpleDialog(
+        children: <Widget>[
+          TextField(),
+          TextField(),
+
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -64,14 +83,19 @@ class _AdvertiserState extends State<Advertiser> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.grey,
-        body: Flex(
-          direction: Axis.horizontal,
-          children: <Widget>[
-            _buildPackageCard(startup),
-            _buildPackageCard(premium),
-            _buildPackageCard(custom),
-          ],
+        backgroundColor: Colors.blue,
+        body: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/back3.jpg'), fit: BoxFit.fill)),
+          child: Flex(
+            direction: Axis.horizontal,
+            children: <Widget>[
+              _buildPackageCard(startup),
+              _buildPackageCard(premium),
+              _buildPackageCard(custom),
+            ],
+          ),
         ),
       ),
     );
@@ -80,31 +104,42 @@ class _AdvertiserState extends State<Advertiser> {
   Widget _buildPackageCard(Package package) {
     return Expanded(
       child: Card(
+        shape: StadiumBorder(
+          side: BorderSide(
+            //color: Theme.of(context).accentColor
+          )
+        ),
+        color: Theme.of(context).primaryColor.withOpacity(.4),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              color: package.color,
-              child: ListTile(
-                title: Text(package.title),
+            Text(
+              package.title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 30,
+                fontStyle: FontStyle.italic,
+                decoration: TextDecoration.lineThrough,
+                color: Theme.of(context).accentColor,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                package.price,
-                style: TextStyle(fontSize: 20),
-              ),
+            SizedBox(
+              height: 30,
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                package.description,
-                style: TextStyle(),
-                softWrap: true,
+            for (var text in package.benefits)
+              Text(
+                text,
+                style: TextStyle(
+                  color: Theme.of(context).accentColor
+                ),
               ),
+            RaisedButton(
+              onPressed: (){},
+              child: Text("Buy"),
+              color: Theme.of(context).primaryColor,
+              shape: StadiumBorder(),
             )
-          ]
+          ],
         ),
       ),
     );

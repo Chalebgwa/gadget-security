@@ -69,9 +69,9 @@ class _FancySearchState extends State<FancySearch>
             onPressed: onSearchPress,
             child: Icon(
               focusIcon,
-              color: Colors.black,
+              color: Theme.of(context).primaryColor,
             ),
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.purple,
           ),
         )
       ],

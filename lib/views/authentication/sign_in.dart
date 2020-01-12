@@ -6,12 +6,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/util/validator.dart';
+import 'package:gsec/views/dashboard.dart';
+import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
+import 'package:hidden_drawer_menu/simple_hidden_drawer/bloc/simple_hidden_drawer_bloc.dart';
 import 'package:provider/provider.dart';
 
 class SignIn extends StatefulWidget {
   final VoidCallback onBlueClick;
+  final SimpleHiddenDrawerBloc controller;
 
-  SignIn({Key key, this.onBlueClick}) : super(key: key);
+  SignIn({Key key, this.onBlueClick, this.controller}) : super(key: key);
 
   @override
   _SignInState createState() => _SignInState();
@@ -23,6 +27,13 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _passwordController = new TextEditingController();
   Auth _auth;
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  SimpleHiddenDrawerBloc controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = widget.controller;
+  }
 
   @override
   void didChangeDependencies() {
@@ -34,7 +45,7 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      color: Colors.black.withOpacity(.5),
+      color: Theme.of(context).primaryColor.withOpacity(.4),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -51,7 +62,10 @@ class _SignInState extends State<SignIn> {
                         child: Text(
                           "Login",
                           style: TextStyle(
-                              color: Colors.blue.shade100, fontSize: 30),
+                            color: Theme.of(context).accentColor,
+                            fontSize: 30,
+                            fontFamily: 'pacifico'
+                          ),
                         ),
                       )),
                   Expanded(
@@ -61,10 +75,10 @@ class _SignInState extends State<SignIn> {
                       child: FloatingActionButton(
                         child: Icon(
                           FontAwesomeIcons.solidArrowAltCircleRight,
-                          color: Colors.blue,
+                          color: Colors.purple,
                         ),
                         onPressed: widget.onBlueClick,
-                        backgroundColor: Colors.black,
+                        backgroundColor: Theme.of(context).primaryColor,
                       ),
                     ),
                   )
@@ -107,16 +121,21 @@ class _SignInState extends State<SignIn> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                      ),
                       controller: _resetController,
-                      decoration: InputDecoration(hintText: "email"),
+                      decoration: InputDecoration(
+                          hintText: "email", border: UnderlineInputBorder()),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: RaisedButton(
-                      color: Colors.blue,
+                      elevation: 50,
+                      color: Theme.of(context).primaryColor,
                       child: Text("reset password"),
-                      onPressed: login,
+                      onPressed: reset,
                     ),
                   )
                 ],
@@ -130,17 +149,25 @@ class _SignInState extends State<SignIn> {
     return Container(
       margin: EdgeInsets.all(20),
       child: RaisedButton(
-          color: Colors.white,
+        color: Theme.of(context).primaryColor,
+        child: Container(
+          width: double.infinity,
           child: Container(
-            width: double.infinity,
-            child: Container(
-                width: 25, height: 25, child: Center(child: Text("Sign In"))),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          onPressed: login),
+              width: 25, height: 25, child: Center(child: Text("Sign In"))),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        onPressed: login,
+      ),
     );
+  }
+
+  void reset() async {
+    String email = _resetController.text;
+    String message = await _auth.resetPassword(email);
+    Navigator.pop(context);
+    Fluttertoast.showToast(msg: message);
   }
 
   void login() async {
@@ -166,18 +193,20 @@ class _SignInState extends State<SignIn> {
         controller: controller,
         obscureText: isPass,
         style: TextStyle(
-          color: Colors.white,
+          color: Theme.of(context).accentColor,
         ),
         decoration: InputDecoration(
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle:
+                TextStyle(color: Theme.of(context).accentColor.withOpacity(.5)),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.white,
+                color: Theme.of(context).accentColor,
               ),
             ),
             hintText: "Enter your " + label,
             labelText: label,
-            hintStyle: TextStyle(color: Colors.grey)),
+            hintStyle: TextStyle(
+                color: Theme.of(context).accentColor.withOpacity(.5))),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gsec/models/user.dart';
 import 'package:gsec/page.dart';
@@ -12,10 +13,9 @@ class UserInfo extends StatelessWidget {
     return Page(
       
       child: ListView(
+        
         children: <Widget>[
-          CircleAvatar(
-            radius: 30,
-          ),
+          buildUserAvatar(user),
           Card(
             child: ListTile(
               title: Text(user.name),
@@ -68,6 +68,31 @@ class UserInfo extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+
+  Stack buildUserAvatar(User user) {
+    return Stack(
+      children: <Widget>[
+        CachedNetworkImage(
+          key: Key("myImage"),
+          imageBuilder: (context, imageProvider) => CircleAvatar(
+            radius: 35,
+            backgroundColor: Theme.of(context).primaryColor,
+            child: CircleAvatar(
+              radius: 30,
+              backgroundImage: imageProvider,
+            ),
+          ),
+          imageUrl: user.imageUrl ??
+              "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
+          placeholder: (context, url) => Container(
+            child: CircularProgressIndicator(),
+          ),
+          errorWidget: (context, url, error) => Icon(Icons.error),
+        ),
+      ],
     );
   }
 }

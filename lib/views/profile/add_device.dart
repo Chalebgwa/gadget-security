@@ -9,6 +9,11 @@ import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:provider/provider.dart';
 
+
+// device classes
+
+
+
 class AddDevice extends StatefulWidget {
   final DeviceProvider deviceProvider;
 
@@ -177,5 +182,6 @@ class _AddDeviceState extends State<AddDevice> {
     String uid = _auth.currentUser.id;
     Device _device = Device(ssn,uid,productName,type:_deviceType);
     _auth.addDevice(_device);
+    Navigator.pop(context);
   }
 }

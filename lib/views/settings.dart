@@ -12,6 +12,7 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   bool _isLeftHanded = false;
+  bool _isDarkThemed = false;
   SettingsProvider _settingsProvider;
 
   @override
@@ -24,6 +25,7 @@ class _SettingsState extends State<Settings> {
     super.didChangeDependencies();
     _settingsProvider = Provider.of<SettingsProvider>(context);
     _isLeftHanded = _settingsProvider.isLeftHanded;
+    _isDarkThemed = _settingsProvider.isDarkTheme;
     //setState(() {});
   }
 
@@ -31,18 +33,23 @@ class _SettingsState extends State<Settings> {
     _settingsProvider.isLefHanded(value);
   }
 
+  void switchToDarkTheme(bool value) {
+    _settingsProvider.isDarkThemed(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Page(
       child: ListView(
         children: <Widget>[
-          buildSettingsCard(),
+          buildSettingsCard('Gestures','switch to left hand',saveHand,_isLeftHanded),
+          buildSettingsCard('Appearance','switch to dark theme',switchToDarkTheme,_isDarkThemed),
         ],
       ),
     );
   }
 
-  Widget buildSettingsCard() {
+  Widget buildSettingsCard(String title,String action,funct,value) {
     var detailStyle = TextStyle(color: Colors.white);
 
     return ListBody(
@@ -52,7 +59,7 @@ class _SettingsState extends State<Settings> {
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("Gestures"),
+              title: Text(title),
             ),
           ),
         ),
@@ -60,7 +67,7 @@ class _SettingsState extends State<Settings> {
           color: Colors.black.withOpacity(.5),
           child: Column(
             children: <Widget>[
-              buildListItem("switch to left hand", detailStyle),
+              buildListItem(action, detailStyle,funct,value),
             ],
           ),
         ),
@@ -71,15 +78,15 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  ListTile buildListItem(label, TextStyle detailStyle) {
+  ListTile buildListItem(label, TextStyle detailStyle,funct,value) {
     return ListTile(
       title: Text(
         label,
         style: detailStyle,
       ),
       trailing: Switch(
-        onChanged: saveHand,
-        value: _isLeftHanded,
+        onChanged: funct,
+        value: value,
       ),
     );
   }

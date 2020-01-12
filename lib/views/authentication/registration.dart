@@ -5,13 +5,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/util/validator.dart';
+import 'package:hidden_drawer_menu/simple_hidden_drawer/bloc/simple_hidden_drawer_bloc.dart';
 import 'package:provider/provider.dart';
 
 class Registration extends StatefulWidget {
   final Auth auth;
   final VoidCallback onBlueClick;
 
-  Registration({Key key, this.auth, this.onBlueClick}) : super(key: key);
+  Registration(
+      {Key key, this.auth, this.onBlueClick, SimpleHiddenDrawerBloc controller})
+      : super(key: key);
 
   @override
   _RegistrationState createState() => _RegistrationState();
@@ -22,9 +25,9 @@ class _RegistrationState extends State<Registration> {
 
   Auth _auth;
   DeviceProvider _deviceProvider;
+  String _deviceName;
+  String _deviceId;
   GlobalKey<FormState> _registrationFormKey = GlobalKey<FormState>();
-
-  Map<String, String> _deviceInfo = {};
 
   final TextEditingController _nameController = new TextEditingController();
 
@@ -50,6 +53,8 @@ class _RegistrationState extends State<Registration> {
     super.didChangeDependencies();
     _auth = Provider.of<Auth>(context);
     _deviceProvider = Provider.of<DeviceProvider>(context);
+    _deviceName = _deviceProvider.details['model'];
+    _deviceId = _deviceProvider.details['identifier'];
   }
 
   Future<void> save() async {
@@ -73,10 +78,9 @@ class _RegistrationState extends State<Registration> {
         _gorvId,
       );
 
-
       // register device here
       if (_saveDevice && uid != null) {
-        bool result = await _deviceProvider.savePrimaryDevice(_deviceInfo, uid);
+        bool result = await _deviceProvider.savePrimaryDevice(uid);
         if (!result) {
           Fluttertoast.showToast(msg: "Device already exists");
         }
@@ -93,29 +97,88 @@ class _RegistrationState extends State<Registration> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(left: 20, right: 20),
-      color: Colors.black.withOpacity(.5),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _registrationFormKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              buildheader(),
-              buildTextField("name", _nameController, Validator.validateName),
-              buildTextField(
-                  "surname", _surnameController, Validator.validateName),
-              buildTextField("gorvernment id", _gorvenmentIdController,
-                  Validator.validateIDNumber),
-              buildTextField(
-                  "phone", _phoneController, Validator.validateNumber),
-              buildTextField(
-                  "email", _emailController, Validator.validateEmail),
-              buildTextField(
-                  "password", _passwordController, Validator.validatePassword),
-              buildDeviceInfo(),
-              buildRegisterButton(),
-            ],
-          ),
+      //
+      child: Form(
+        key: _registrationFormKey,
+        child: ListView(
+          //mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            buildheader(),
+            Container(
+              margin: EdgeInsets.only(
+                top: 20,
+                bottom: 20,
+              ),
+              color: Theme.of(context).primaryColor.withOpacity(.4),
+              child: Column(
+                children: <Widget>[
+                  Card(
+                    child: ListTile(
+                      title: Text('User Details'),
+                    ),
+                  ),
+                  buildTextField(
+                    "name",
+                    _nameController,
+                    Validator.validateName,
+                    'name',
+                  ),
+                  buildTextField("surname", _surnameController,
+                      Validator.validateName, 'surname'),
+                  buildTextField(
+                    "gorvernment id",
+                    _gorvenmentIdController,
+                    Validator.validateIDNumber,
+                    '000000000',
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              ),
+            ),
+            Container(
+              color: Theme.of(context).primaryColor.withOpacity(.4),
+              child: Column(
+                children: <Widget>[
+                  Card(
+                    child: ListTile(
+                      title: Text('Security Details'),
+                    ),
+                  ),
+                  buildTextField(
+                    "phone",
+                    _phoneController,
+                    Validator.validateNumber,
+                    'eg +267 77777777',
+                  ),
+                  buildTextField(
+                    "email",
+                    _emailController,
+                    Validator.validateEmail,
+                    'email',
+                  ),
+                  buildTextField("password", _passwordController,
+                      Validator.validatePassword, 'password'),
+                ],
+              ),
+            ),
+            Container(
+              color: Theme.of(context).primaryColor.withOpacity(.4),
+              margin: EdgeInsets.only(top: 20,bottom: 20),
+              child: Column(
+                children: <Widget>[
+                  Card(
+                    child: ListTile(
+                      title: Text('Device Details'),
+                    ),
+                  ),
+                  buildDeviceInfo(),
+                ],
+              ),
+            ),
+            buildRegisterButton(),
+          ],
         ),
       ),
     );
@@ -132,10 +195,10 @@ class _RegistrationState extends State<Registration> {
             child: FloatingActionButton(
               child: Icon(
                 FontAwesomeIcons.solidArrowAltCircleLeft,
-                color: Colors.blue,
+                color: Colors.purple,
               ),
               onPressed: widget.onBlueClick,
-              backgroundColor: Colors.black,
+              backgroundColor: Theme.of(context).primaryColor,
             ),
           ),
         ),
@@ -145,7 +208,10 @@ class _RegistrationState extends State<Registration> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 "Registration",
-                style: TextStyle(color: Colors.blue.shade100, fontSize: 30),
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 30,
+                    fontFamily: 'pacifico'),
               ),
             ))
       ],
@@ -161,32 +227,32 @@ class _RegistrationState extends State<Registration> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              _deviceInfo["model"] ?? "Device Name",
-              style: TextStyle(color: Colors.white),
+              _deviceName ?? "Device Name",
+              style: TextStyle(
+                  color: Theme.of(context).accentColor,
+                  fontWeight: FontWeight.bold,),
             ),
           ),
         ),
         Expanded(
           flex: 2,
-          child: Card(
-            color: Colors.transparent,
-            child: CheckboxListTile(
-              title: Text(
-                "save device",
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.white,
-                ),
+          child: CheckboxListTile(
+            checkColor: Colors.purple,
+            title: Text(
+              "save device",
+              style: TextStyle(
+                fontSize: 10,
+                color: Theme.of(context).primaryColor,
               ),
-              activeColor: Colors.blue,
-              selected: true,
-              value: _saveDevice,
-              onChanged: (bool value) {
-                setState(() {
-                  _saveDevice = value;
-                });
-              },
             ),
+            activeColor: Theme.of(context).primaryColor,
+            selected: true,
+            value: _saveDevice,
+            onChanged: (bool value) {
+              setState(() {
+                _saveDevice = value;
+              });
+            },
           ),
         )
       ],
@@ -197,7 +263,7 @@ class _RegistrationState extends State<Registration> {
     return Container(
       margin: EdgeInsets.all(20),
       child: RaisedButton(
-        color: Colors.blue,
+        color: Theme.of(context).primaryColor,
         child: Container(
           width: double.infinity,
           child: Center(child: Text("Sign up")),
@@ -208,23 +274,26 @@ class _RegistrationState extends State<Registration> {
     );
   }
 
-  Padding buildTextField(label, controller, validator) {
+  Padding buildTextField(label, controller, validator, hint) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
         validator: validator,
         controller: controller,
         style: TextStyle(
-          color: Colors.white,
+          color: Theme.of(context).accentColor,
         ),
         decoration: InputDecoration(
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle:
+              TextStyle(color: Theme.of(context).accentColor.withOpacity(.6)),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-              color: Colors.white,
+              color: Theme.of(context).accentColor,
             ),
           ),
-          hintText: "Enter your" + label,
+          hintText: hint,
+          hintStyle:
+              TextStyle(color: Theme.of(context).accentColor, fontSize: 10.0),
           labelText: label,
         ),
       ),
