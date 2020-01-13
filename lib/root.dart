@@ -23,15 +23,22 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
+    var screen;
+
     switch (_auth.state) {
       case AuthState.SIGNED_OUT:
-        return FancyDrawer();
+        screen = FancyDrawer();
+        break;
       case AuthState.LOADING:
-        return LoadingScreen();
+        screen = LoadingScreen();
+        break;
       case AuthState.SIGNED_IN:
-        return FancyDrawer();
+        screen = FancyDrawer();
+        break;
       default:
         return FancyDrawer();
     }
+
+    return screen;
   }
 }

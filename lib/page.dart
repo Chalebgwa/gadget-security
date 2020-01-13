@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/settings_provider.dart';
 import 'package:gsec/views/loading_screen.dart';

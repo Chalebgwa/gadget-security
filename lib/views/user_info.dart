@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/models/user.dart';
 import 'package:gsec/page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,67 +11,52 @@ class UserInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Page(
-      
-      child: ListView(
-        
-        children: <Widget>[
-          buildUserAvatar(user),
-          Card(
-            child: ListTile(
-              title: Text(user.name),
-            ),
+    return Column(
+      children: <Widget>[
+        ListTile(
+          leading: Icon(FontAwesomeIcons.user),
+          title: Text('${user.name} ${user.surname}'),
+        ),
+        ListTile(
+          leading: Icon(FontAwesomeIcons.phone),
+          title: Text(user.phone),
+        ),
+        ListTile(
+          leading: Icon(Icons.email),
+          title: Text(user.email),
+        ),
+        ListTile(
+          leading: Icon(Icons.location_city),
+          title: Text(user.country),
+        ),
+        Card(
+          child: ButtonBar(
+            alignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.phone),
+                onPressed: () {
+                  launch("tel:${user.phone}");
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.message),
+                onPressed: () {
+                  launch('sms:${user.phone}');
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.email),
+                onPressed: () {
+                  launch('email:${user.email}');
+                },
+              ),
+            ],
           ),
-          Card(
-            child: ListTile(
-              title: Text(user.surname),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text(user.phone),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text(user.email),
-            ),
-          ),
-          Card(
-            child: ListTile(
-              title: Text(user.country),
-            ),
-          ),
-          Card(
-            child: ButtonBar(
-              alignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.phone),
-                  onPressed: () {
-                    launch("tel:${user.phone}");
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.message),
-                  onPressed: () {
-                    launch('sms:${user.phone}');
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.email),
-                  onPressed: () {
-                    launch('email:${user.email}');
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-
 
   Stack buildUserAvatar(User user) {
     return Stack(

@@ -23,13 +23,15 @@ class DeviceProvider extends BaseProvider {
 
   /// returns the device's owner using [ssn] as the indetifier
   Future<User> fetchUser() async {
-    try{
+    try {
       var did = _details['identifier'];
+
       var docRef = firestore.collection('primary').document(did);
       var docSnap = await docRef.get();
       if (docSnap.exists) {
         // fetch user id from the device document
         var uid = docSnap.data['uid'];
+        print(uid);
 
         //fetch user info using [uid]
         docRef = firestore.collection('users').document(uid);
@@ -43,7 +45,7 @@ class DeviceProvider extends BaseProvider {
 
       // return nothing if user not registered
       return null;
-    } catch (e){
+    } catch (e) {
       Fluttertoast.showToast(msg: 'Device Offline');
       return null;
     }
@@ -56,10 +58,10 @@ class DeviceProvider extends BaseProvider {
   /// fetch device information locally
   Future<void> initDeviceInfo() async {
     DeviceInfoPlugin infoPlugin = DeviceInfoPlugin();
-    
+
     if (Platform.isAndroid) {
       var info = await infoPlugin.androidInfo;
-  
+
       _details = {
         'identifier': info.androidId,
         'model': info.model,
@@ -67,7 +69,7 @@ class DeviceProvider extends BaseProvider {
       };
     } else if (Platform.isIOS) {
       var info = await infoPlugin.iosInfo;
-     
+
       _details = {
         'identifier': info.identifierForVendor,
         'model': info.model,
@@ -78,6 +80,7 @@ class DeviceProvider extends BaseProvider {
     // fetch owner details from the database
     if (_details.containsKey('identifier')) {
       _owner = await fetchUser();
+      print('The device belongs to ${_owner?.name}');
       notifyListeners();
     }
 

@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  awesome_dialog: ^0.1.0
   square_in_app_payments: 
   hidden_drawer_menu: ^1.1.2
   bouncing_widget: ^1.2.0

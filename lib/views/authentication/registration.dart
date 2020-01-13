@@ -88,7 +88,7 @@ class _RegistrationState extends State<Registration> {
         Fluttertoast.showToast(msg: "user failed to register");
       }
     }
-    //Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   void init() async {}

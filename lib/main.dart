@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gsec/fancy_drawer.dart';
 import 'package:gsec/fancy_theme.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/chat_provider.dart';
