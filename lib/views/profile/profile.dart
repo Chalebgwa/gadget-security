@@ -11,6 +11,7 @@ import 'package:gsec/models/user.dart';
 import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/widgets/device_card.dart';
+import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 import 'package:provider/provider.dart';
 
@@ -40,53 +41,50 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildHomeView(BuildContext context) {
-
     var theme = Theme.of(context);
 
-    return Material(
-      type: MaterialType.transparency,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
+    return Stack(
+      children: <Widget>[
+        Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.all(10),
-          color: theme.primaryColor.withOpacity(.4),
+          //color: theme.primaryColor.withOpacity(.4),
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               //mainAxisAlignment: MainAxisAlignment.center,
               //crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
+                SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: LiquidCircularProgressIndicator(
+                    value: .6, // Defaults to 0.5.
+                    valueColor: AlwaysStoppedAnimation(
+                      Colors.pink,
+                    ), // Defaults to the current Theme's accentColor.
+                    backgroundColor: Colors
+                        .white, // Defaults to the current Theme's backgroundColor.
+                    borderColor: Colors.transparent,
+                    borderWidth: 5.0,
+                    direction: Axis
+                        .vertical, // The direction the liquid moves (Axis.vertical = bottom to top, Axis.horizontal = left to right). Defaults to Axis.vertical.
+                    center: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: buildUserAvatar(),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            _currentUser?.name ?? "",
-                            style: TextStyle(fontSize: 30, color: theme.accentColor),
-                          ),
-                          Text(
-                            _currentUser?.surname ?? "",
-                            style: TextStyle(fontSize: 20, color: theme.accentColor),
-                          ),
-                        ],
+                    )//Text("Profile",style: TextStyle(fontSize: 15),),
+                  ),
+                ),
+                Card(
+                    shape: StadiumBorder(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '${_currentUser.name} ${_currentUser.surname}',
+                        style: TextStyle(fontSize: 20),
                       ),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 20,
-                  color: Theme.of(context).accentColor.withOpacity(.6),
-                ),
-                SizedBox(height: 10),
+                    )),
+                //SizedBox(height: 20),
 
                 //SizedBox(height: 3),
 
@@ -140,7 +138,7 @@ class _ProfileState extends State<Profile> {
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -223,10 +221,10 @@ class _ProfileState extends State<Profile> {
         CachedNetworkImage(
           key: Key("myImage"),
           imageBuilder: (context, imageProvider) => CircleAvatar(
-            radius: 35,
-            backgroundColor: Theme.of(context).primaryColor,
+            radius: 55,
+            backgroundColor: Theme.of(context).primaryColor.withOpacity(.8),
             child: CircleAvatar(
-              radius: 30,
+              radius: 40,
               backgroundImage: imageProvider,
             ),
           ),

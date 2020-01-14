@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  image_cropper: ^1.1.2
+  liquid_progress_indicator: ^0.3.2
   awesome_dialog: ^0.1.0
   square_in_app_payments: 
   hidden_drawer_menu: ^1.1.2

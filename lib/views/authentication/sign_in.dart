@@ -44,54 +44,56 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      color: Theme.of(context).primaryColor.withOpacity(.4),
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Expanded(
-                      flex: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            color: Theme.of(context).accentColor,
-                            fontSize: 30,
-                            fontFamily: 'pacifico'
-                          ),
-                        ),
-                      )),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FloatingActionButton(
-                        child: Icon(
-                          FontAwesomeIcons.solidArrowAltCircleRight,
-                          color: Colors.purple,
-                        ),
-                        onPressed: widget.onBlueClick,
-                        backgroundColor: Theme.of(context).primaryColor,
-                      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(right: 80),
+                  child: Text(
+                    "Login",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 30,
+                      fontFamily: 'pacifico',
                     ),
-                  )
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FloatingActionButton(
+                    heroTag: 'blue',
+                    child: Icon(
+                      FontAwesomeIcons.solidArrowAltCircleRight,
+                      color: Colors.purple,
+                    ),
+                    onPressed: widget.onBlueClick,
+                    backgroundColor: Theme.of(context).primaryColor,
+                  ),
+                )
+              ],
+            ),
+
+            Container(
+              margin: EdgeInsets.only(left: 20, right: 20, bottom: 20,top: 20),
+              color: Theme.of(context).primaryColor.withOpacity(.4),
+              child: Column(
+                children: <Widget>[
+                  buildTextField("email", _emailController, false,
+                      Validator.validateEmail),
+                  buildTextField("password", _passwordController, true,
+                      Validator.validatePassword),
+                  buildLoginButton(_auth),
+                  
                 ],
               ),
-              buildTextField(
-                  "email", _emailController, false, Validator.validateEmail),
-              buildTextField("password", _passwordController, true,
-                  Validator.validatePassword),
-              buildLoginButton(_auth),
-              buildForgotpassword(_auth)
-            ],
-          ),
+            ),
+            buildForgotpassword(_auth)
+          ],
         ),
       ),
     );

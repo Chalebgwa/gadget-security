@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:admob_flutter/admob_flutter.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:barcode_scan/barcode_scan.dart';
@@ -99,9 +101,10 @@ class _DashboardState extends State<Dashboard> {
 
   void showOwnerInfo(User user) {
     showAlertDialogOnOkCallback(
-      user,
-      Text('')
-    );
+        user,
+        UserInfo(
+          user: user,
+        ));
   }
 
   void navigateToScanner(BuildContext context) async {
@@ -175,23 +178,19 @@ class _DashboardState extends State<Dashboard> {
                     }
                   },
                   decoration: InputDecoration(
-                    suffixIcon: Container(
-                      height: 40,
-                      width: 20,
-                      child: FlatButton(
-                        highlightColor: Colors.purple,
-                        child: Icon(
-                          FontAwesomeIcons.search,
-                          color: _searchActive
-                              ? Colors.purple
-                              : Theme.of(context).accentColor,
-                        ),
-                        onPressed: _searchActive
-                            ? () {
-                                searchBySSN(_controller.text);
-                              }
-                            : null,
+                    suffixIcon: FlatButton(
+                      highlightColor: Colors.purple,
+                      child: Icon(
+                        FontAwesomeIcons.search,
+                        color: _searchActive
+                            ? Colors.purple
+                            : Theme.of(context).accentColor,
                       ),
+                      onPressed: _searchActive
+                          ? () {
+                              searchBySSN(_controller.text);
+                            }
+                          : null,
                     ),
                     hintText: 'Serial Number',
                     hintStyle: TextStyle(
@@ -199,7 +198,7 @@ class _DashboardState extends State<Dashboard> {
                         color: Theme.of(context).accentColor.withOpacity(.3)),
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
-                      //borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(40),
                     ),
                     fillColor: Theme.of(context).primaryColor,
                     filled: true,
@@ -277,22 +276,25 @@ class DashCard extends StatelessWidget {
           highlightColor: Colors.red,
           splashColor: Colors.yellow,
           onTap: ontap,
-          child: Container(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  icon,
-                  color: Theme.of(context).accentColor,
-                ),
-                Text(
-                  label,
-                  style: TextStyle(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    icon,
                     color: Theme.of(context).accentColor,
                   ),
-                ),
-              ],
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

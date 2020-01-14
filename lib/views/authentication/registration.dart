@@ -165,7 +165,7 @@ class _RegistrationState extends State<Registration> {
             ),
             Container(
               color: Theme.of(context).primaryColor.withOpacity(.4),
-              margin: EdgeInsets.only(top: 20,bottom: 20),
+              margin: EdgeInsets.only(top: 20, bottom: 20),
               child: Column(
                 children: <Widget>[
                   Card(
@@ -193,6 +193,7 @@ class _RegistrationState extends State<Registration> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: FloatingActionButton(
+              heroTag: 'blue',
               child: Icon(
                 FontAwesomeIcons.solidArrowAltCircleLeft,
                 color: Colors.purple,
@@ -229,8 +230,9 @@ class _RegistrationState extends State<Registration> {
             child: Text(
               _deviceName ?? "Device Name",
               style: TextStyle(
-                  color: Theme.of(context).accentColor,
-                  fontWeight: FontWeight.bold,),
+                color: Theme.of(context).accentColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),

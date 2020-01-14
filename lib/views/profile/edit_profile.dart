@@ -11,6 +11,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/models/user.dart';
 import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class _EditProfileState extends State<EditProfile> {
   File image;
   Auth _auth;
   User _currentUser;
+  bool _isLoadingImage = false;
 
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _surnameController = new TextEditingController();
@@ -49,7 +51,6 @@ class _EditProfileState extends State<EditProfile> {
     _nameController.text = _currentUser?.name ?? "";
     _surnameController.text = _currentUser?.surname ?? "";
 
-    _middlenameController.text = _currentUser?.name ?? "";
     _idController.text = _currentUser?.gorvenmentId ?? "";
 
     _emailController.text = _currentUser?.email ?? "";
@@ -61,6 +62,8 @@ class _EditProfileState extends State<EditProfile> {
 
   void pickImageGallery() async {
     var file = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    file = await _cropImage(file);
     setState(() {
       image = file;
     });
@@ -93,9 +96,43 @@ class _EditProfileState extends State<EditProfile> {
         context: context);
   }
 
+  Future<File> _cropImage(File file) async {
+    File croppedFile = await ImageCropper.cropImage(
+      sourcePath: file.path,
+      aspectRatioPresets: Platform.isAndroid
+          ? [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ]
+          : [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio5x3,
+              CropAspectRatioPreset.ratio5x4,
+              CropAspectRatioPreset.ratio7x5,
+              CropAspectRatioPreset.ratio16x9
+            ],
+      androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Cropper',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Theme.of(context).accentColor,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false),
+    );
+    if (croppedFile != null) {
+      return croppedFile;
+    }
+    return file;
+  }
+
   void save() async {
     var _name = _nameController.text;
-    var _surname = _phoneController.text;
+    var _surname = _surnameController.text;
     var _middleName = _middlenameController.text;
     var _id = _idController.text;
     var _phone = _phoneController.text;
@@ -178,7 +215,6 @@ class _EditProfileState extends State<EditProfile> {
           children: <Widget>[
             buildTextField("name", _nameController),
             buildTextField("surname", _surnameController),
-            buildTextField("middle name", _middlenameController),
             buildTextField("id number", _idController),
           ],
         ),
@@ -280,6 +316,8 @@ class _EditProfileState extends State<EditProfile> {
           ),
           errorWidget: (context, url, error) => Icon(Icons.error),
         ),
+        if(_isLoadingImage)
+          CircularProgressIndicator()
       ],
     );
   }

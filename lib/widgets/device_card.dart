@@ -186,20 +186,7 @@ class _DeviceCardState extends State<DeviceCard> {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: LinearGradient(
-          colors: [
-            Colors.white,
-            Colors.red,
-          ],
-          begin: Alignment.topCenter,
-          stops: [
-            2.0,
-            2.0,
-          ],
-        ),
-      ),
+      color: Theme.of(context).primaryColor.withOpacity(.5),
       child: InkWell(
         onTap: () {
           _showDeviceInfo(context);

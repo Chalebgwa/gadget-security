@@ -14,45 +14,64 @@ class UserInfo extends StatelessWidget {
     return Column(
       children: <Widget>[
         ListTile(
-          leading: Icon(FontAwesomeIcons.user),
+          leading: Icon(
+            FontAwesomeIcons.user,
+            color: Colors.purple,
+          ),
           title: Text('${user.name} ${user.surname}'),
         ),
         ListTile(
-          leading: Icon(FontAwesomeIcons.phone),
+          leading: Icon(FontAwesomeIcons.phone, color: Colors.purple),
           title: Text(user.phone),
         ),
         ListTile(
-          leading: Icon(Icons.email),
-          title: Text(user.email),
+          leading: Icon(
+            Icons.email,
+            color: Colors.purple,
+          ),
+          title: Text(
+            user.email,
+          ),
         ),
         ListTile(
-          leading: Icon(Icons.location_city),
-          title: Text(user.country),
-        ),
-        Card(
-          child: ButtonBar(
-            alignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.phone),
-                onPressed: () {
-                  launch("tel:${user.phone}");
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.message),
-                onPressed: () {
-                  launch('sms:${user.phone}');
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.email),
-                onPressed: () {
-                  launch('email:${user.email}');
-                },
-              ),
-            ],
+          leading: Icon(
+            Icons.location_city,
+            color: Colors.purple,
           ),
+          title: Text('${user.country}, ${user.city}'),
+        ),
+        Divider(),
+        ButtonBar(
+          alignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            FloatingActionButton(
+              child: Icon(
+                Icons.phone,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                launch("tel:${user.phone}");
+              },
+            ),
+            FloatingActionButton(
+              child: Icon(
+                Icons.message,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                launch('sms:${user.phone}');
+              },
+            ),
+            FloatingActionButton(
+              child: Icon(
+                Icons.email,
+                color: Theme.of(context).primaryColor,
+              ),
+              onPressed: () {
+                launch('email:${user.email}');
+              },
+            ),
+          ],
         ),
       ],
     );
