@@ -1,18 +1,13 @@
-import 'dart:ui';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gsec/models/device.dart';
 import 'package:gsec/page.dart';
-import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:provider/provider.dart';
 
-
 // device classes
-
-
 
 class AddDevice extends StatefulWidget {
   final DeviceProvider deviceProvider;
@@ -24,164 +19,217 @@ class AddDevice extends StatefulWidget {
 }
 
 class _AddDeviceState extends State<AddDevice> {
-  final TextEditingController nameController = new TextEditingController();
-  final TextEditingController ssnController = new TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  Auth _auth;
-
-  String ssn;
-  String _deviceType;
-  
+  DeviceProvider _deviceProvider;
+  Map<String, String> _details;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _auth = Provider.of<Auth>(context);
+    _deviceProvider = Provider.of<DeviceProvider>(context);
+    _details = _deviceProvider.details;
   }
 
-  void deviceInfo() async {}
+  List<StaggeredTile> _staggeredTiles = const <StaggeredTile>[
+    const StaggeredTile.count(2, 1),
+    const StaggeredTile.count(1, 1),
+    const StaggeredTile.count(1, 1),
+    const StaggeredTile.count(1, 1),
+    const StaggeredTile.count(1, 1),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Page(
-        child: Container(
-          margin: EdgeInsets.only(
-            left: 30,
-            right: 30,
-          ),
-          child: Container(
-            color: Colors.black.withOpacity(.5),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  //mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: CircleAvatar(
-                        radius: 30,
-                        child: Icon(
-                          FontAwesomeIcons.puzzlePiece,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "ADD DEVICE",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    buildTextField("product name", nameController),
-                    buildTextField("Serial number", ssnController),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: DropdownButton<String>(
-                        //underline: Divider(color: Colors.white,),
-
-                        isExpanded: true,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        value: _deviceType,
-
-                        hint: Text(
-                          "Gadget type",
-                          style: TextStyle(
-                            color: Colors.white,
+        child: StaggeredGridView.count(
+          crossAxisCount: 2,
+          staggeredTiles: _staggeredTiles,
+          children: [
+            Tile(
+              child: Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      color: Colors.blueGrey,
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              FontAwesomeIcons.phone,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        icon: Icon(FontAwesomeIcons.mobile),
-                        elevation: 30,
-                        items: <DropdownMenuItem<String>>[
-                          buildDropdownMenuItem("laptop"),
-                          buildDropdownMenuItem("mobile"),
-                          buildDropdownMenuItem("monitor"),
-                          buildDropdownMenuItem("car"),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('DEVICE'),
+                          ),
+                          Text('INFO')
                         ],
-                        onChanged: (value) {
-                          setState(() {
-                            _deviceType = value;
-                          });
-                        },
                       ),
                     ),
-                    //buildTextField("IMEI 1", imei1Controller),
-                    //buildTextField("IMEI 2", imei2Controller),
-
-                    buildConfirmButton(context),
-                  ],
-                ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(_details['identifier']),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(_details['name']),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(_details['model']),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
-          ),
+            Tile(
+              form: _LaptopForm(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      FontAwesomeIcons.laptop,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Laptop'),
+                  )
+                ],
+              ),
+            ),
+            Tile(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      FontAwesomeIcons.mobileAlt,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Mobile'),
+                  )
+                ],
+              ),
+            ),
+            Tile(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      FontAwesomeIcons.tv,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('TV/Monitor'),
+                  )
+                ],
+              ),
+            ),
+            Tile(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      FontAwesomeIcons.plus,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('Other'),
+                  )
+                ],
+              ),
+            )
+          ],
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
+          padding: const EdgeInsets.all(4.0),
         ),
       ),
     );
   }
+}
 
-  DropdownMenuItem<String> buildDropdownMenuItem(label) {
-    return DropdownMenuItem(
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.grey,
-        ),
-      ),
-      value: label,
-    );
-  }
+class Tile extends StatelessWidget {
+  final Widget child;
+  final Widget form;
 
-  Container buildConfirmButton(context) {
-    return Container(
-      margin: EdgeInsets.all(20),
-      child: RaisedButton(
-        color: Colors.blue,
-        child: Container(
-          width: double.infinity,
-          child: Center(child: Text("Confirm")),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        onPressed: save,
+  const Tile({Key key, this.child, this.form}) : super(key: key);
+
+  void _showForm(context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: form,
+          );
+        },
       ),
     );
   }
 
-  Padding buildTextField(label, controller) {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          _showForm(context);
+        },
+        child: child ?? Container(),
+      ),
+    );
+  }
+}
+
+class _LaptopForm extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        controller: controller,
-        style: TextStyle(
-          color: Colors.white,
-        ),
-        decoration: InputDecoration(
-          labelStyle: TextStyle(color: Colors.white),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.white,
+      child: Form(
+        child: Column(
+          children: <Widget>[
+
+            TextFormField(),
+            TextFormField(),
+            TextFormField(),
+            SizedBox(
+              width: double.maxFinite,
+              
+              child: RaisedButton(
+                child: Text('save'),
+                onPressed: () {},
+              ),
             ),
-          ),
-          hintText: "Enter your" + label,
-          labelText: label,
+          ],
         ),
       ),
     );
-  }
-
-  void save() {
-    String productName = nameController.text;
-    String ssn = ssnController.text;
-    String uid = _auth.currentUser.id;
-    Device _device = Device(ssn,uid,productName,type:_deviceType);
-    _auth.addDevice(_device);
-    Navigator.pop(context);
   }
 }

@@ -175,46 +175,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Stack buildInboxButton() {
-    return Stack(
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.all(10),
-          child: RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Icon(
-              FontAwesomeIcons.exchangeAlt,
-              color: Colors.black,
-            ),
-            color: Colors.grey.shade200,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    //builder: (context) => Inbox(),
-                    ),
-              );
-            },
-          ),
-        ),
-        Positioned(
-          right: 2,
-          top: 9,
-          child: CircleAvatar(
-            backgroundColor: Colors.blue,
-            child: Text(
-              "34",
-              style: TextStyle(color: Colors.white),
-            ),
-            radius: 15,
-          ),
-        ),
-      ],
-    );
-  }
-
+  
   Stack buildUserAvatar() {
     return Stack(
       children: <Widget>[

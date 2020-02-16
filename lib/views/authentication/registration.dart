@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -126,7 +127,7 @@ class _RegistrationState extends State<Registration> {
                   buildTextField("surname", _surnameController,
                       Validator.validateName, 'surname'),
                   buildTextField(
-                    "gorvernment id",
+                    "Legal Identification number",
                     _gorvenmentIdController,
                     Validator.validateIDNumber,
                     '000000000',
@@ -146,11 +147,23 @@ class _RegistrationState extends State<Registration> {
                       title: Text('Security Details'),
                     ),
                   ),
+                  CountryCodePicker(
+                        onChanged: print,
+                        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                        initialSelection: 'IT',
+                        favorite: ['+39', 'FR'],
+                        // optional. Shows only country name and flag
+                        showCountryOnly: false,
+                        // optional. Shows only country name and flag when popup is closed.
+                        showOnlyCountryWhenClosed: false,
+                        // optional. aligns the flag and the Text left
+                        alignLeft: false,
+                      ),
                   buildTextField(
                     "phone",
                     _phoneController,
                     Validator.validateNumber,
-                    'eg +267 77777777',
+                    'eg 77777777',
                   ),
                   buildTextField(
                     "email",
@@ -276,7 +289,7 @@ class _RegistrationState extends State<Registration> {
     );
   }
 
-  Padding buildTextField(label, controller, validator, hint) {
+  Padding buildTextField(label, controller, validator, hint,{isPhone:true}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(

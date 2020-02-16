@@ -43,53 +43,44 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Form(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.transparent,
+      body: Form(
         key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Flex(
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(right: 80),
-                  child: Text(
-                    "Login",
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontSize: 30,
-                      fontFamily: 'pacifico',
-                    ),
+            Flexible(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
+                  child: Image.asset(
+                    "assets/splash.png",
+                    color: Colors.purple,
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: FloatingActionButton(
-                    heroTag: 'blue',
-                    child: Icon(
-                      FontAwesomeIcons.solidArrowAltCircleRight,
-                      color: Colors.purple,
-                    ),
-                    onPressed: widget.onBlueClick,
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                )
-              ],
+              ),
             ),
-
-            Container(
-              margin: EdgeInsets.only(left: 20, right: 20, bottom: 20,top: 20),
-              color: Theme.of(context).primaryColor.withOpacity(.4),
-              child: Column(
-                children: <Widget>[
-                  buildTextField("email", _emailController, false,
-                      Validator.validateEmail),
-                  buildTextField("password", _passwordController, true,
-                      Validator.validatePassword),
-                  buildLoginButton(_auth),
-                  
-                ],
+            Flexible(
+              flex: 2,
+              child: Container(
+                margin:
+                    EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 20),
+                color: Theme.of(context).primaryColor.withOpacity(.4),
+                child: Column(
+                  children: <Widget>[
+                    buildTextField("email", _emailController, false,
+                        Validator.validateEmail),
+                    buildTextField("password", _passwordController, true,
+                        Validator.validatePassword),
+                    buildLoginButton(_auth),
+                  ],
+                ),
               ),
             ),
             buildForgotpassword(_auth)
@@ -128,7 +119,9 @@ class _SignInState extends State<SignIn> {
                       ),
                       controller: _resetController,
                       decoration: InputDecoration(
-                          hintText: "email", border: UnderlineInputBorder()),
+                        hintText: "email",
+                        border: UnderlineInputBorder(),
+                      ),
                     ),
                   ),
                   Padding(
@@ -198,6 +191,10 @@ class _SignInState extends State<SignIn> {
           color: Theme.of(context).accentColor,
         ),
         decoration: InputDecoration(
+            prefixIcon: Icon(
+              label == "email" ? Icons.email : Icons.lock,
+              color: Colors.purple,
+            ),
             labelStyle:
                 TextStyle(color: Theme.of(context).accentColor.withOpacity(.5)),
             enabledBorder: UnderlineInputBorder(

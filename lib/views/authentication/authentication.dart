@@ -12,7 +12,7 @@ class Athentication extends StatelessWidget {
 
   void registerPage() {
     pageController.nextPage(
-      curve: Curves.bounceInOut,
+      curve: Curves.fastOutSlowIn,
       duration: Duration(seconds: 1),
     );
   }
@@ -20,7 +20,7 @@ class Athentication extends StatelessWidget {
   void loginPage() {
     //pageController.jumpToPage(1);
     pageController.previousPage(
-      curve: Curves.bounceInOut,
+      curve: Curves.fastOutSlowIn,
       duration: Duration(seconds: 1),
     );
   }
@@ -28,21 +28,31 @@ class Athentication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Page(
-      child: PageView(
-        pageSnapping: true,
-        controller: pageController,
-        scrollDirection: Axis.horizontal,
-        physics: BouncingScrollPhysics(),
-        children: <Widget>[
-          SignIn(
-            onBlueClick: registerPage,
-            controller: bloc,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(
+            'Gadget Security',
+            style: TextStyle(fontFamily: 'pacifico'),
           ),
-          Registration(
-            onBlueClick: loginPage,
-            controller: bloc,
-          )
-        ],
+          centerTitle: true,
+        ),
+        body: PageView(
+          pageSnapping: true,
+          controller: pageController,
+          scrollDirection: Axis.horizontal,
+          physics: BouncingScrollPhysics(),
+          children: <Widget>[
+            SignIn(
+              onBlueClick: registerPage,
+              controller: bloc,
+            ),
+            Registration(
+              onBlueClick: loginPage,
+              controller: bloc,
+            )
+          ],
+        ),
       ),
     );
   }

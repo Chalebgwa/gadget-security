@@ -49,15 +49,17 @@ class _PageState extends State<Page> {
             child: Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage(
-                      "assets/back3.jpg",
-                    ),
-                    fit: BoxFit.fill),
+                  image: AssetImage(
+                    "assets/back3.jpg",
+                  ),
+                  fit: BoxFit.fill,
+                ),
               ),
               child: Scaffold(
                 key: _globalKey,
                 floatingActionButton: widget.fab,
                 backgroundColor: Colors.transparent,
+                resizeToAvoidBottomInset: true,
                 body: Container(
                   decoration: BoxDecoration(
                       //color: Colors.black.withOpacity(.3),

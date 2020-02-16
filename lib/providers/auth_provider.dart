@@ -224,7 +224,7 @@ class Auth extends BaseProvider {
 
     await firebaseAuth.verifyPhoneNumber(
         codeAutoRetrievalTimeout: autoRetrieve,
-        phoneNumber: phone,
+        phoneNumber: '+267'+phone,
         codeSent: codeSent,
         timeout: const Duration(seconds: 5),
         verificationCompleted: verificationCompleted,
@@ -290,7 +290,7 @@ class Auth extends BaseProvider {
     notifyListeners();
   }
 
-  Future<void> updateProfileImage(File image) async {
+  Future<bool> updateProfileImage(File image) async {
     //set loading screen
     _state = AuthState.LOADING;
     notifyListeners();
@@ -300,6 +300,7 @@ class Auth extends BaseProvider {
     StorageUploadTask uploadTask = reference.putFile(image);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     String url = await storageTaskSnapshot.ref.getDownloadURL();
+    print(url);
 
     Map<String, String> data = {"imageUrl": url};
     await firestore

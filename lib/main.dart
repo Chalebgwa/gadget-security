@@ -35,7 +35,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       child: App(),
-      providers: <SingleChildCloneableWidget>[
+      providers: [
         ChangeNotifierProvider(
           create: (BuildContext context) => PayService(),
         ),

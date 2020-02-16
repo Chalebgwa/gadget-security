@@ -61,7 +61,6 @@ class DeviceProvider extends BaseProvider {
 
     if (Platform.isAndroid) {
       var info = await infoPlugin.androidInfo;
-
       _details = {
         'identifier': info.androidId,
         'model': info.model,
@@ -69,7 +68,6 @@ class DeviceProvider extends BaseProvider {
       };
     } else if (Platform.isIOS) {
       var info = await infoPlugin.iosInfo;
-
       _details = {
         'identifier': info.identifierForVendor,
         'model': info.model,

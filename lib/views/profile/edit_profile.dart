@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'dart:ui';
 
@@ -68,12 +69,14 @@ class _EditProfileState extends State<EditProfile> {
       image = file;
     });
     Navigator.pop(context);
+    await upload(image);
   }
 
   void pickImageCamera() async {
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {
       image = file;
+      _isLoadingImage = true;
     });
     Navigator.pop(context);
   }
@@ -94,6 +97,15 @@ class _EditProfileState extends State<EditProfile> {
           );
         },
         context: context);
+  }
+
+  Future<void> upload(File image) async {
+    _auth.updateProfileImage(image).then((value) {
+      Fluttertoast.showToast(msg: 'Image uploaded');
+      setState(() {
+        _isLoadingImage = false;
+      });
+    });
   }
 
   Future<File> _cropImage(File file) async {
@@ -141,24 +153,18 @@ class _EditProfileState extends State<EditProfile> {
     var _country = _countryController.text;
     var _imageUrl = _auth.currentUser.imageUrl;
 
-    if (image != null) {
-      _imageUrl = await _auth.uploadImage(image);
-    }
-
     _auth.updateUser(
-        city: _city,
-        country: _country,
-        email: _email,
-        idNumber: _id,
-        phone: _phone,
-        userId: _currentUser.id,
-        middlename: _middleName,
-        name: _name,
-        surname: _surname,
-        imageUrl: _imageUrl);
-    if (image != null) {
-      _auth.updateProfileImage(image);
-    }
+      city: _city,
+      country: _country,
+      email: _email,
+      idNumber: _id,
+      phone: _phone,
+      userId: _currentUser.id,
+      middlename: _middleName,
+      name: _name,
+      surname: _surname,
+      imageUrl: _imageUrl,
+    );
   }
 
   @override
@@ -176,7 +182,7 @@ class _EditProfileState extends State<EditProfile> {
                 margin: EdgeInsets.all(20),
                 width: double.infinity,
                 alignment: Alignment.center,
-                child: image != null ? buildLocalImage() : buildUserAvatar(),
+                child: buildUserAvatar(),
               ),
             ),
             buildUserDetailsCard(),
@@ -300,25 +306,28 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Stack buildUserAvatar() {
-    return Stack(
-      children: <Widget>[
-        CachedNetworkImage(
-          key: Key("myImage"),
-          imageBuilder: (context, imageProvider) => CircleAvatar(
-            radius: 40,
-            backgroundImage: imageProvider,
-          ),
-          imageUrl:
-              "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
-          placeholder: (context, url) => Container(
-            child: CircularProgressIndicator(),
-          ),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-        ),
-        if(_isLoadingImage)
-          CircularProgressIndicator()
-      ],
-    );
+  Widget buildUserAvatar() {
+    if (!_isLoadingImage) {
+      return Stack(
+        children: <Widget>[
+          CachedNetworkImage(
+                key: Key("myImage"),
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  radius: 40,
+                  backgroundImage: imageProvider,
+                ),
+                imageUrl: _currentUser?.imageUrl ??
+                    "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
+                placeholder: (context, url) => Container(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+              Icon(FontAwesomeIcons.edit,color: Colors.purple,)
+        ],
+      );
+    } else {
+      return CircularProgressIndicator();
+    }
   }
 }
