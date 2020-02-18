@@ -1,3 +1,4 @@
+import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,6 +20,7 @@ class _FancyDrawerState extends State<FancyDrawer> {
   // Authentication
   Auth _auth;
   SettingsProvider _settings;
+  Widget screen = Dashboard();
 
   @override
   void didChangeDependencies() {
@@ -27,69 +29,88 @@ class _FancyDrawerState extends State<FancyDrawer> {
     _settings = Provider.of<SettingsProvider>(context);
   }
 
+  Widget screenBuilder(index, controller) {
+    var screen;
+
+    switch (index) {
+      case 0:
+        setState(() {
+          screen = Dashboard();
+        });
+
+        break;
+      case 1:
+        setState(() {
+          screen = Settings();
+        });
+
+        break;
+      case 2:
+        setState(() {
+          screen = Profile();
+        });
+        break;
+      case 3:
+        _auth.signOut();
+        setState(() {
+          screen = Dashboard();
+        });
+
+        break;
+
+      default:
+        screen = Dashboard();
+        break;
+    }
+
+    return WillPopScope(
+      onWillPop: () async {
+        if (index == 0) {
+          return true;
+        }
+
+        controller.toggle();
+        SimpleHiddenDrawerProvider.of(context)
+            .controllers
+            .setPositionSelected(0);
+        controller.toggle();
+        setState(() {
+          screen = Dashboard();
+        });
+
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          actions: _buildActions(controller),
+          centerTitle: true,
+          title: Text(
+            'Gadget Security',
+            style: TextStyle(
+                //color: Theme.of(context).accentColor,
+                fontFamily: 'pacifico'),
+          ),
+          leading: IconButton(
+            icon: Icon(
+              FontAwesomeIcons.bars,
+            ),
+            onPressed: () {
+              controller.toggle();
+            },
+          ),
+        ),
+        body: screen,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SimpleHiddenDrawer(
       typeOpen:
           _settings.isLeftHanded ? TypeOpen.FROM_LEFT : TypeOpen.FROM_RIGHT,
       menu: Menu(),
-      screenSelectedBuilder: (index, controller) {
-        var screen;
-
-        switch (index) {
-          case 0:
-            screen = Dashboard();
-            break;
-          case 1:
-            screen = Settings();
-            break;
-          case 2:
-            screen = Profile();
-            break;
-          case 3:
-            _auth.signOut();
-            screen = Dashboard();
-            break;
-
-          default:
-            screen = Dashboard();
-            break;
-        }
-
-        return WillPopScope(
-          onWillPop: () async {
-            if(index == 0) {
-              return true;
-            }
-            
-            setState(() {
-              screen = Dashboard();
-            });
-            return false;
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              actions: _buildActions(controller),
-              centerTitle: true,
-              title: Text(
-                'Gadget Security',
-                style: TextStyle(
-                    //color: Theme.of(context).accentColor,
-                    fontFamily: 'pacifico'),
-              ),
-              leading: IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.bars,
-                ),
-                onPressed: () {
-                  controller.toggle();
-                },
-              ),
-            ),
-            body: screen,
-          ),
-        );
-      },
+      screenSelectedBuilder: screenBuilder,
     );
   }
 
@@ -227,8 +248,10 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
                     : Alignment.topRight,
                 child: IconButton(
                   onPressed: _toggle,
-                  icon: Icon(FontAwesomeIcons.solidWindowClose),
-                  color: Colors.purple,
+                  icon: Icon(FontAwesomeIcons.bars
+                  
+                  ),
+                  color: Theme.of(context).primaryColor,
                   iconSize: 40,
                 ),
               )
@@ -239,21 +262,24 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
     );
   }
 
-  SizedBox buildDrawerButton(BuildContext context, int index, String title) {
-    return SizedBox(
-      width: 200.0,
-      child: RaisedButton(
-        color: Colors.purple,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20.0))),
-        onPressed: () {
-          SimpleHiddenDrawerProvider.of(context).setSelectedMenuPosition(index);
-        },
-        child: Text(
-          title,
-          style: TextStyle(color: Colors.white),
+  Widget buildDrawerButton(BuildContext context, int index, String title) {
+    return BouncingWidget(
+
+          child: SizedBox(
+        width: 200.0,
+        child: RaisedButton(
+          color: Theme.of(context).primaryColor,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          onPressed: () {
+            SimpleHiddenDrawerProvider.of(context).setSelectedMenuPosition(index);
+          },
+          child: Text(
+            title,
+            style: TextStyle(color: Theme.of(context).accentColor),
+          ),
         ),
-      ),
+      ), onPressed: () {},
     );
   }
 

@@ -29,12 +29,22 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-
   @override
   Widget build(BuildContext context) {
+
+    
     return MultiProvider(
-      child: App(),
+      child: GestureDetector(
+        child: App(),
+        excludeFromSemantics: true,
+        behavior: HitTestBehavior.opaque,
+        onSecondaryTapDown: (details) {
+          print(details.globalPosition);
+        },
+        onTap: () {
+          print(" i object");
+        },
+      ),
       providers: [
         ChangeNotifierProvider(
           create: (BuildContext context) => PayService(),
@@ -43,7 +53,7 @@ class _MyAppState extends State<MyApp> {
           create: (BuildContext context) => Auth(),
         ),
         ChangeNotifierProvider(
-        create: (BuildContext context) => DeviceProvider(),
+          create: (BuildContext context) => DeviceProvider(),
         ),
         ChangeNotifierProvider(
           create: (BuildContext context) => SettingsProvider(),
@@ -62,7 +72,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-
   bool isDarkThemed = false;
 
   @override
@@ -75,7 +84,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: isDarkThemed ? fancyDarkTheme: fancyLightTheme,
+      theme: isDarkThemed ? fancyDarkTheme : fancyLightTheme,
       title: 'Gadget Security',
       initialRoute: "/",
       routes: {
@@ -89,7 +98,7 @@ class _AppState extends State<App> {
         "/inbox": (context) => Inbox(),
         "/notifications": (context) => Notifications(),
         "/settings": (context) => Settings(),
-        "/dashboard":(context) => Dashboard()
+        "/dashboard": (context) => Dashboard()
       },
     );
   }

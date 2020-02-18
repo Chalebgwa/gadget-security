@@ -42,32 +42,72 @@ class _SettingsState extends State<Settings> {
     return Page(
       child: ListView(
         children: <Widget>[
-          buildSettingsCard('Gestures','switch to left hand',saveHand,_isLeftHanded),
-          buildSettingsCard('Appearance','switch to dark theme',switchToDarkTheme,_isDarkThemed),
+          buildSettingsCard(
+              'Gestures', 'switch to left hand', saveHand, _isLeftHanded),
+          buildSettingsCard('Appearance', 'switch to dark theme',
+              switchToDarkTheme, _isDarkThemed),
+          Card(
+            color: Theme.of(context).primaryColor.withOpacity(.4),
+            child: ListBody(
+              children: <Widget>[
+                Container(
+                  color: Theme.of(context).primaryColor,
+                  child: ListTile(
+                    title: Text(
+                      "Security",
+                      style: TextStyle(
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                ),
+                _buildTextField("PIN", ""),
+                _buildTextField("Emergency Number", ""),
+                _buildTextField("Next of Kin Number", ""),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget buildSettingsCard(String title,String action,funct,value) {
-    var detailStyle = TextStyle(color: Colors.white);
+  Widget _buildTextField(hint, controller) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: Theme.of(context).accentColor,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildSettingsCard(String title, String action, funct, value) {
+    var detailStyle = TextStyle(color: Theme.of(context).accentColor);
 
     return ListBody(
       children: <Widget>[
         Container(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text(title),
+              title: Text(
+                title,
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
             ),
           ),
         ),
         Container(
-          color: Colors.black.withOpacity(.5),
+          color: Theme.of(context).primaryColor.withOpacity(.5),
           child: Column(
             children: <Widget>[
-              buildListItem(action, detailStyle,funct,value),
+              buildListItem(action, detailStyle, funct, value),
             ],
           ),
         ),
@@ -78,7 +118,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  ListTile buildListItem(label, TextStyle detailStyle,funct,value) {
+  ListTile buildListItem(label, TextStyle detailStyle, funct, value) {
     return ListTile(
       title: Text(
         label,

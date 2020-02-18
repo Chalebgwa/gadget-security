@@ -185,8 +185,14 @@ class _DeviceCardState extends State<DeviceCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       margin: EdgeInsets.all(5),
-      color: Theme.of(context).primaryColor.withOpacity(.5),
+      
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withOpacity(.9),
+        shape: BoxShape.circle,
+        
+      ),
       child: InkWell(
         onTap: () {
           _showDeviceInfo(context);
@@ -194,13 +200,25 @@ class _DeviceCardState extends State<DeviceCard> {
         child: Center(
           child: SizedBox(
             width: 90,
-            child: Text(
-              widget.device.name,
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  widget.device.name,
+                  style: TextStyle(
+                    color: Theme.of(context).accentColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),Text(
+                  "Laptop",
+                  style: TextStyle(
+                    color: Theme.of(context).accentColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

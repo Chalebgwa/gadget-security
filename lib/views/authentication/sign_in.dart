@@ -57,11 +57,11 @@ class _SignInState extends State<SignIn> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
+                  radius: 40,
+                  backgroundColor: Theme.of(context).primaryColor.withOpacity(.4),
                   child: Image.asset(
                     "assets/splash.png",
-                    color: Colors.purple,
+                    color: Theme.of(context).accentColor,
                   ),
                 ),
               ),
@@ -70,7 +70,7 @@ class _SignInState extends State<SignIn> {
               flex: 2,
               child: Container(
                 margin:
-                    EdgeInsets.only(left: 20, right: 20, bottom: 20, top: 20),
+                    EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 color: Theme.of(context).primaryColor.withOpacity(.4),
                 child: Column(
                   children: <Widget>[

@@ -169,7 +169,7 @@ class Auth extends BaseProvider {
       // todo : find out what could actually go wrong
       if (authResult != null) {
         FirebaseUser _user = authResult.user;
-        authenticateViaPhone(phone);
+        await authenticateViaPhone(phone);
         Map<String, String> _userInfo = {
           "name": name,
           "surname": surname,
@@ -202,6 +202,7 @@ class Auth extends BaseProvider {
   }
 
   Future<void> authenticateViaPhone(String phone) async {
+    print(phone);
     // auto retrieve verification code
     final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verID) {
       this.verificationId = verID;
@@ -209,11 +210,13 @@ class Auth extends BaseProvider {
 
     final PhoneCodeSent codeSent = (String verID, [int forceCodeResend]) {
       this.verificationId = verID;
+      print(verID);
       Fluttertoast.showToast(msg: "Phone verification code sent");
     };
 
     final PhoneVerificationCompleted verificationCompleted =
         (AuthCredential credential) {
+      print(credential);
       Fluttertoast.showToast(msg: "Phone verification Completed");
     };
 
@@ -223,12 +226,13 @@ class Auth extends BaseProvider {
     };
 
     await firebaseAuth.verifyPhoneNumber(
-        codeAutoRetrievalTimeout: autoRetrieve,
-        phoneNumber: '+267'+phone,
-        codeSent: codeSent,
-        timeout: const Duration(seconds: 5),
-        verificationCompleted: verificationCompleted,
-        verificationFailed: verificationFailed);
+      codeAutoRetrievalTimeout: autoRetrieve,
+      phoneNumber: phone,
+      codeSent: codeSent,
+      timeout: const Duration(microseconds: 0),
+      verificationCompleted: verificationCompleted,
+      verificationFailed: verificationFailed,
+    );
   }
 
   Future<String> uploadImage(File image) async {

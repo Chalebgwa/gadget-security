@@ -28,6 +28,8 @@ class _RegistrationState extends State<Registration> {
   DeviceProvider _deviceProvider;
   String _deviceName;
   String _deviceId;
+  String _countryCode = "+267";
+
   GlobalKey<FormState> _registrationFormKey = GlobalKey<FormState>();
 
   final TextEditingController _nameController = new TextEditingController();
@@ -46,7 +48,6 @@ class _RegistrationState extends State<Registration> {
   @override
   void initState() {
     super.initState();
-    init();
   }
 
   @override
@@ -65,7 +66,7 @@ class _RegistrationState extends State<Registration> {
       String _email = _emailController.text;
       String _gorvId = _gorvenmentIdController.text;
       String _password = _passwordController.text;
-      String _phone = _phoneController.text;
+      String _phone = _countryCode + _phoneController.text;
 
       // register user before u register device
       // it would be safer to check if a user's device can register
@@ -89,10 +90,8 @@ class _RegistrationState extends State<Registration> {
         Fluttertoast.showToast(msg: "user failed to register");
       }
     }
-    Navigator.pop(context);
+    //Navigator.pop(context);
   }
-
-  void init() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +103,7 @@ class _RegistrationState extends State<Registration> {
         child: ListView(
           //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            buildheader(),
+            //buildheader(),
             Container(
               margin: EdgeInsets.only(
                 top: 20,
@@ -147,23 +146,41 @@ class _RegistrationState extends State<Registration> {
                       title: Text('Security Details'),
                     ),
                   ),
-                  CountryCodePicker(
-                        onChanged: print,
-                        // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                        initialSelection: 'IT',
-                        favorite: ['+39', 'FR'],
-                        // optional. Shows only country name and flag
-                        showCountryOnly: false,
-                        // optional. Shows only country name and flag when popup is closed.
-                        showOnlyCountryWhenClosed: false,
-                        // optional. aligns the flag and the Text left
-                        alignLeft: false,
+                  Row(
+                    children: <Widget>[
+                      Flexible(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CountryCodePicker(
+                            onChanged: (cc) {
+                              setState(() {
+                                _countryCode = cc.dialCode;
+                              });
+                            },
+                            // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
+                            initialSelection: 'BW',
+                            favorite: ['+267', 'BW'],
+
+                            // optional. Shows only country name and flag
+                            showCountryOnly: false,
+                            // optional. Shows only country name and flag when popup is closed.
+                            showOnlyCountryWhenClosed: false,
+                            // optional. aligns the flag and the Text left
+                            alignLeft: false,
+                          ),
+                        ),
                       ),
-                  buildTextField(
-                    "phone",
-                    _phoneController,
-                    Validator.validateNumber,
-                    'eg 77777777',
+                      Flexible(
+                        flex: 3,
+                        child: buildTextField(
+                          "phone",
+                          _phoneController,
+                          Validator.validateNumber,
+                          'eg 77777777',
+                        ),
+                      ),
+                    ],
                   ),
                   buildTextField(
                     "email",
@@ -289,7 +306,7 @@ class _RegistrationState extends State<Registration> {
     );
   }
 
-  Padding buildTextField(label, controller, validator, hint,{isPhone:true}) {
+  Padding buildTextField(label, controller, validator, hint, {isPhone: true}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
