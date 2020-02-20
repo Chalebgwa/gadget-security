@@ -25,6 +25,12 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     var screen;
 
+    _auth.checkLoginStatus();
+
+    setState(() {
+      
+    });
+
     switch (_auth.state) {
       case AuthState.SIGNED_OUT:
         screen = FancyDrawer();

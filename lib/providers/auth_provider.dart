@@ -12,6 +12,7 @@ import 'package:gsec/models/user.dart';
 import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthState {
   SIGNED_IN,
@@ -50,6 +51,37 @@ class Auth extends BaseProvider {
 
   UserProvider get userProvider => _userProvider;
 
+  Future<void> setPersistantLogin(User user) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isLoggedIn", true);
+    List<String> data = User.toList(user);
+    prefs.setStringList("userData", data);
+    notifyListeners();
+  }
+
+  Future<void> checkLoginStatus() async {
+    var prefs = await SharedPreferences.getInstance();
+    bool status = prefs.getBool("isLoggedIn") ?? false;
+    print(status);
+    if (status) {
+      List<String> data = prefs.getStringList("userData");
+      if (data != null) {
+        print(data);
+        _currentUser = User.fromList(data);
+        _state = AuthState.SIGNED_IN;
+        notifyListeners();
+      }
+    } else {
+      _state = AuthState.SIGNED_OUT;
+      notifyListeners();
+    }
+  }
+
+  Future<void> resetPrefs() async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isLoggedIn", false);
+  }
+
   Future<bool> signInWithEmail(String email, String password) async {
     //set the screen to show loading
     _state = AuthState.LOADING;
@@ -69,6 +101,8 @@ class Auth extends BaseProvider {
         DocumentSnapshot snapshot = await reference.get();
 
         _currentUser = User.fromMap(snapshot.data);
+        // set persistant login
+        setPersistantLogin(_currentUser);
         _state = AuthState.SIGNED_IN;
         notifyListeners();
         return true;
@@ -116,6 +150,7 @@ class Auth extends BaseProvider {
     await firebaseAuth.signOut().then((b) {
       _state = AuthState.SIGNED_OUT;
       notifyListeners();
+      resetPrefs();
       print("logged out");
     });
   }

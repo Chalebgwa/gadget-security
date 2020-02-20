@@ -115,6 +115,7 @@ class _FancyDrawerState extends State<FancyDrawer> {
   }
 
   List<Widget> _buildActions(SimpleHiddenDrawerBloc controller) {
+    _auth.checkLoginStatus();
     return [
       if (_auth.state == AuthState.SIGNED_OUT)
         FlatButton(
@@ -248,9 +249,7 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
                     : Alignment.topRight,
                 child: IconButton(
                   onPressed: _toggle,
-                  icon: Icon(FontAwesomeIcons.bars
-                  
-                  ),
+                  icon: Icon(FontAwesomeIcons.bars),
                   color: Theme.of(context).primaryColor,
                   iconSize: 40,
                 ),
@@ -264,22 +263,23 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
 
   Widget buildDrawerButton(BuildContext context, int index, String title) {
     return BouncingWidget(
-
-          child: SizedBox(
+      child: SizedBox(
         width: 200.0,
         child: RaisedButton(
           color: Theme.of(context).primaryColor,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))),
           onPressed: () {
-            SimpleHiddenDrawerProvider.of(context).setSelectedMenuPosition(index);
+            SimpleHiddenDrawerProvider.of(context)
+                .setSelectedMenuPosition(index);
           },
           child: Text(
             title,
             style: TextStyle(color: Theme.of(context).accentColor),
           ),
         ),
-      ), onPressed: () {},
+      ),
+      onPressed: () {},
     );
   }
 
