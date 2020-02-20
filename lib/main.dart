@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gsec/fancy_theme.dart';
 import 'package:gsec/providers/auth_provider.dart';
@@ -16,6 +17,7 @@ import 'package:gsec/views/profile/edit_profile.dart';
 import 'package:gsec/views/profile/profile.dart';
 import 'package:gsec/views/settings.dart';
 import 'package:gsec/views/util/scanner.dart';
+import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -31,19 +33,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-
-    
     return MultiProvider(
-      child: GestureDetector(
-        child: App(),
-        excludeFromSemantics: true,
+      child: PositionedTapDetector(
         behavior: HitTestBehavior.opaque,
-        onSecondaryTapDown: (details) {
-          print(details.globalPosition);
+        onTap: (position) {
+          print("hello");
         },
-        onTap: () {
-          print(" i object");
-        },
+        child: App(),
       ),
       providers: [
         ChangeNotifierProvider(
@@ -101,5 +97,12 @@ class _AppState extends State<App> {
         "/dashboard": (context) => Dashboard()
       },
     );
+  }
+}
+
+class AllowMultipleGestureRecognizer extends TapGestureRecognizer {
+  @override
+  void rejectGesture(int pointer) {
+    acceptGesture(pointer);
   }
 }

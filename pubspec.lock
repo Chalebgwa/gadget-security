@@ -520,6 +520,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  positioned_tap_detector:
+    dependency: "direct main"
+    description:
+      name: positioned_tap_detector
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.3"
   provider:
     dependency: "direct main"
     description:
@@ -672,6 +679,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  tesseract_ocr:
+    dependency: "direct main"
+    description:
+      name: tesseract_ocr
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   test_api:
     dependency: transitive
     description:

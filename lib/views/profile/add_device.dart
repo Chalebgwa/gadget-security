@@ -5,6 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/page.dart';
 import 'package:gsec/providers/device_provider.dart';
+import 'package:gsec/views/profile/doc_scanner.dart';
 import 'package:provider/provider.dart';
 
 // device classes
@@ -197,6 +198,7 @@ class Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Theme.of(context).primaryColor.withOpacity(.5),
       child: InkWell(
         onTap: () {
           _showForm(context);
@@ -215,13 +217,17 @@ class _LaptopForm extends StatelessWidget {
       child: Form(
         child: Column(
           children: <Widget>[
-
+            FlatButton(
+                child: Text("SCAN RECIEPT"),
+                onPressed: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (c) => DocScanner()));
+                }),
             TextFormField(),
             TextFormField(),
             TextFormField(),
             SizedBox(
               width: double.maxFinite,
-              
               child: RaisedButton(
                 child: Text('save'),
                 onPressed: () {},

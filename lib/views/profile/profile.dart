@@ -140,7 +140,7 @@ class _ProfileState extends State<Profile> {
               ),
             ),
           ),
-          filter: ImageFilter.blur(sigmaX: 0.5,sigmaY: 0.5),
+          filter: ImageFilter.blur(sigmaX: 0.5, sigmaY: 0.5),
         ),
       ],
     );
