@@ -34,13 +34,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      child: PositionedTapDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: (position) {
-          print("hello");
-        },
-        child: App(),
-      ),
+      child: App(), 
       providers: [
         ChangeNotifierProvider(
           create: (BuildContext context) => PayService(),

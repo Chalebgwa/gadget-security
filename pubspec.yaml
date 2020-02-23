@@ -17,34 +17,35 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
-  tesseract_ocr: ^0.3.0
-  positioned_tap_detector: ^1.0.3
-  card_settings: ^1.5.5
-  flutter_staggered_grid_view: ^0.3.0
-  country_code_picker: ^1.2.3
-  image_cropper: ^1.1.2
-  liquid_progress_indicator: ^0.3.2
-  awesome_dialog: ^0.1.0
+  file_picker:
+  tesseract_ocr: #^0.3.0
+  positioned_tap_detector: #^1.0.3
+  card_settings: #^1.5.5
+  flutter_staggered_grid_view: #^0.3.0
+  country_code_picker: #^1.2.3
+  image_cropper: #^1.1.2
+  liquid_progress_indicator: #^0.3.2
+  awesome_dialog: #^0.1.0
   square_in_app_payments: 
-  hidden_drawer_menu: ^1.1.2
-  bouncing_widget: ^1.2.0
-  cached_network_image: ^2.0.0-rc
-  admob_flutter: ^0.3.4
+  hidden_drawer_menu: #^1.1.2
+  bouncing_widget: #^1.2.0
+  cached_network_image: #^2.0.0-rc
+  admob_flutter: #^0.3.4
   firebase_admob:
-  fluttertoast: ^3.1.2
-  serial_number: 0.1.0
+  fluttertoast: #^3.1.2
+  serial_number: #0.1.0
   cloud_firestore:
-  firebase_core: 0.4.0+9
-  firebase_storage: 3.0.6
-  firebase_auth: 0.14.0+4
-  flutter_signin_button: ^0.2.8
+  firebase_core: #0.4.0+9
+  firebase_storage: #3.0.6
+  firebase_auth: #0.14.0+4
+  flutter_signin_button: #^0.2.8
   google_sign_in: 4.0.6
   url_launcher:
   qr_flutter: #^2.1.0
   font_awesome_flutter:
   provider:
-  barcode_scan: 1.0.0
-  image_picker: 0.6.1+4 #0.4.12+1
+  barcode_scan: #1.0.0
+  image_picker: #0.6.1+4 #0.4.12+1
   device_info: #0.3.0
   shared_preferences: #0.4.3
   flutter:

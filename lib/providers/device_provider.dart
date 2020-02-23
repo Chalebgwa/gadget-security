@@ -102,8 +102,9 @@ class DeviceProvider extends BaseProvider {
     return false;
   }
 
-  Future<void> addDevice(Device device) async {
+  Future<void> addDevice(Device device, {url}) async {
     Map _details = Device.toMap(device);
+    _details["document"] = url;
     print(_details);
     await firestore
         .collection("devices")

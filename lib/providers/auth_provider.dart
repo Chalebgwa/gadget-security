@@ -30,7 +30,7 @@ class Auth extends BaseProvider {
   UserProvider _userProvider = new UserProvider();
 
   // current state of the app
-  AuthState _state = AuthState.SIGNED_OUT;
+  AuthState _state; // = AuthState.SIGNED_OU;
 
   // logged in user
   User _currentUser;
@@ -48,6 +48,10 @@ class Auth extends BaseProvider {
 
   // auto retrieve verification id
   String verificationId;
+
+  Auth() {
+    checkLoginStatus();
+  }
 
   UserProvider get userProvider => _userProvider;
 
@@ -270,14 +274,14 @@ class Auth extends BaseProvider {
     );
   }
 
-  Future<String> uploadImage(File image) async {
+  Future<String> uploadDocument(File file, String link) async {
     _state = AuthState.LOADING;
     notifyListeners();
 
     StorageReference storageRef =
-        FirebaseStorage.instance.ref().child(currentUser.id);
+        FirebaseStorage.instance.ref().child(link + currentUser.id);
 
-    StorageUploadTask uploadTask = storageRef.putFile(image);
+    StorageUploadTask uploadTask = storageRef.putFile(file);
 
     await uploadTask.onComplete;
 
@@ -329,14 +333,17 @@ class Auth extends BaseProvider {
     notifyListeners();
   }
 
-  Future<bool> updateProfileImage(File image) async {
+  Future<void> uploadFile(File file, {filename}) async {
     //set loading screen
     _state = AuthState.LOADING;
     notifyListeners();
 
-    String filename = _currentUser.id;
+    if (filename == null) {
+      filename = _currentUser.id;
+    }
+
     StorageReference reference = FirebaseStorage.instance.ref().child(filename);
-    StorageUploadTask uploadTask = reference.putFile(image);
+    StorageUploadTask uploadTask = reference.putFile(file);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     String url = await storageTaskSnapshot.ref.getDownloadURL();
     print(url);
@@ -351,11 +358,13 @@ class Auth extends BaseProvider {
     notifyListeners();
   }
 
-  Future<void> addDevice(Device device) async {
+  Future<void> addDevice(Device device, file) async {
     _state = AuthState.LOADING;
     notifyListeners();
 
-    await _deviceProvider.addDevice(device);
+    String url = await uploadDocument(file, "/${device.identifier}/");
+
+    await _deviceProvider.addDevice(device,url: url);
 
     _state = AuthState.SIGNED_IN;
     notifyListeners();
@@ -389,4 +398,5 @@ class Auth extends BaseProvider {
 
     return User.fromMap(ushot.data);
   }
+
 }

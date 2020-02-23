@@ -100,7 +100,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> upload(File image) async {
-    _auth.updateProfileImage(image).then((value) {
+    _auth.uploadFile(image).then((value) {
       Fluttertoast.showToast(msg: 'Image uploaded');
       setState(() {
         _isLoadingImage = false;

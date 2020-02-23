@@ -115,9 +115,11 @@ class _FancyDrawerState extends State<FancyDrawer> {
   }
 
   List<Widget> _buildActions(SimpleHiddenDrawerBloc controller) {
-    _auth.checkLoginStatus();
+    print(_auth.state);
     return [
-      if (_auth.state == AuthState.SIGNED_OUT)
+      if (_auth.state == AuthState.SIGNED_IN)
+        buildUserAvatar(controller)
+      else
         FlatButton(
           child: Text(
             'Login',
@@ -128,8 +130,6 @@ class _FancyDrawerState extends State<FancyDrawer> {
           ),
           onPressed: _navigateToSignIn,
         )
-      else
-        buildUserAvatar(controller)
     ];
   }
 

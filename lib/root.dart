@@ -16,6 +16,13 @@ class _RootState extends State<Root> {
   Auth _auth;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    //_auth.checkLoginStatus();
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _auth = Provider.of<Auth>(context);
@@ -25,7 +32,7 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     var screen;
 
-    _auth.checkLoginStatus();
+    
 
     setState(() {
       

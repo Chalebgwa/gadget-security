@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gsec/models/device.dart';
 import 'package:gsec/page.dart';
+import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
+import 'package:gsec/views/profile/confirmation_screen.dart';
+import 'package:gsec/views/profile/device_forms/laptop.dart';
 import 'package:gsec/views/profile/doc_scanner.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 // device classes
@@ -98,7 +105,7 @@ class _AddDeviceState extends State<AddDevice> {
               ),
             ),
             Tile(
-              form: _LaptopForm(),
+              form: LaptopForm(),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -204,37 +211,6 @@ class Tile extends StatelessWidget {
           _showForm(context);
         },
         child: child ?? Container(),
-      ),
-    );
-  }
-}
-
-class _LaptopForm extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Form(
-        child: Column(
-          children: <Widget>[
-            FlatButton(
-                child: Text("SCAN RECIEPT"),
-                onPressed: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (c) => DocScanner()));
-                }),
-            TextFormField(),
-            TextFormField(),
-            TextFormField(),
-            SizedBox(
-              width: double.maxFinite,
-              child: RaisedButton(
-                child: Text('save'),
-                onPressed: () {},
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
