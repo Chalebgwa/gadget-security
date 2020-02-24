@@ -7,7 +7,7 @@ import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/widgets/user_selector.dart';
 import 'package:provider/provider.dart';
 
-enum Action { NO, OK }
+enum Action { NO, OK, ALERT }
 
 class DeviceCard extends StatefulWidget {
   final Device device;
@@ -24,6 +24,7 @@ class DeviceCard extends StatefulWidget {
 class _DeviceCardState extends State<DeviceCard> {
   Auth _auth;
   DeviceProvider _deviceProvider;
+  TextEditingController _pinController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -36,15 +37,20 @@ class _DeviceCardState extends State<DeviceCard> {
     Navigator.pop(context);
     var route = MaterialPageRoute<User>(builder: (context) => UserSelector());
     User peer = await Navigator.push<User>(context, route);
-    var action = await showConfirmDialog("trade", peer: peer);
-
-    switch (action) {
-      case Action.OK:
-        _auth.transfer(peer, widget.device);
-        break;
-      case Action.NO:
-        break;
-      default:
+    if (peer != null) {
+      var action = await pinConfirm(peer);
+      print(action);
+      switch (action) {
+        case Action.OK:
+          _auth.transfer(peer, widget.device);
+          break;
+        case Action.NO:
+          break;
+        case Action.ALERT:
+          _auth.alertSecurity(peer);
+          break;
+        default:
+      }
     }
   }
 
@@ -63,6 +69,7 @@ class _DeviceCardState extends State<DeviceCard> {
           return AlertDialog(
             title: Text("Warning"),
             content: Text(content),
+            backgroundColor: Theme.of(context).primaryColor,
             actions: <Widget>[
               FlatButton(
                 child: Text("Yes"),
@@ -71,6 +78,48 @@ class _DeviceCardState extends State<DeviceCard> {
                 },
               ),
               FlatButton(
+                child: Text("No"),
+                onPressed: () {
+                  Navigator.pop(context, Action.NO);
+                },
+              ),
+            ],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(40),
+            ),
+          );
+        });
+  }
+
+  Future<Action> pinConfirm(User peer) async {
+    String content = '';
+
+    return showDialog<Action>(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Type in Security Pin"),
+            content: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Type In Security Pin",
+                ),
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Theme.of(context).accentColor,
+                child: Text("Yes"),
+                onPressed: () async {
+                  if (_pinController.text.length > 0) {
+                    _auth.confirmWithPin(_pinController.text);
+                    Navigator.pop(context, Action.OK);
+                  }
+                },
+              ),
+              FlatButton(
+                color: Theme.of(context).accentColor,
                 child: Text("No"),
                 onPressed: () {
                   Navigator.pop(context, Action.NO);
@@ -111,6 +160,9 @@ class _DeviceCardState extends State<DeviceCard> {
                 children: <Widget>[
                   buildListHeader(),
                   buildListDetail("SSN", widget.device.identifier),
+                  buildListDetail("NAME", widget.device.name ?? "-"),
+                  buildListDetail("IMEI", widget.device.imei ?? "-"),
+                  buildListDetail("TYPE", widget.device.type ?? "-"),
                 ],
               ),
             ),
@@ -120,20 +172,16 @@ class _DeviceCardState extends State<DeviceCard> {
 
   Container buildListHeader() {
     return Container(
-      color: Colors.blue,
+      color: Theme.of(context).accentColor,
       child: IconTheme(
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Container(
-                alignment: Alignment.center,
-                child: Text(
-                  widget.device.name.toUpperCase(),
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              child: Icon(
+                FontAwesomeIcons.checkCircle,
+                color: widget.device.confirmed
+                    ? Colors.green
+                    : Theme.of(context).primaryColor,
               ),
             ),
             Expanded(
@@ -161,16 +209,16 @@ class _DeviceCardState extends State<DeviceCard> {
     );
   }
 
-  Padding buildListDetail(String label, String detail) {
+  Widget buildListDetail(String label, String detail) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
           Text(
             detail,
@@ -184,15 +232,9 @@ class _DeviceCardState extends State<DeviceCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      
-      margin: EdgeInsets.all(5),
-      
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withOpacity(.9),
-        shape: BoxShape.circle,
-        
-      ),
+    return Card(
+      color: Theme.of(context).primaryColor,
+      elevation: 10,
       child: InkWell(
         onTap: () {
           _showDeviceInfo(context);
@@ -210,7 +252,8 @@ class _DeviceCardState extends State<DeviceCard> {
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
-                ),Text(
+                ),
+                Text(
                   "Laptop",
                   style: TextStyle(
                     color: Theme.of(context).accentColor,

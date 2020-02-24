@@ -74,11 +74,13 @@ class _EditProfileState extends State<EditProfile> {
 
   void pickImageCamera() async {
     var file = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    file = await _cropImage(file);
     setState(() {
       image = file;
-      _isLoadingImage = true;
     });
     Navigator.pop(context);
+    await upload(image);
   }
 
   void showPickerOptions() {
@@ -100,12 +102,11 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> upload(File image) async {
-    _auth.uploadFile(image).then((value) {
-      Fluttertoast.showToast(msg: 'Image uploaded');
-      setState(() {
-        _isLoadingImage = false;
-      });
+    await _auth.uploadFile(image);
+    setState(() {
+      _isLoadingImage = false;
     });
+    Fluttertoast.showToast(msg: "Image uploaded");
   }
 
   Future<File> _cropImage(File file) async {
@@ -209,11 +210,11 @@ class _EditProfileState extends State<EditProfile> {
     return ListBody(
       children: <Widget>[
         Container(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("User Details"),
+              title: Text("User Details",style: TextStyle(color: Theme.of(context).accentColor),),
             ),
           ),
         ),
@@ -235,11 +236,11 @@ class _EditProfileState extends State<EditProfile> {
     return ListBody(
       children: <Widget>[
         Container(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("Location"),
+              title: Text("Location",style: TextStyle(color: Theme.of(context).accentColor),),
             ),
           ),
         ),
@@ -260,11 +261,11 @@ class _EditProfileState extends State<EditProfile> {
     return ListBody(
       children: <Widget>[
         Container(
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("Contacts"),
+              title: Text("Contacts",style: TextStyle(color: Theme.of(context).accentColor),),
             ),
           ),
         ),
@@ -283,19 +284,19 @@ class _EditProfileState extends State<EditProfile> {
 
   Widget buildTextField(label, controller) {
     return Container(
-      color: Colors.black.withOpacity(.5),
+      color: Theme.of(context).primaryColor.withOpacity(.5),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextField(
           controller: controller,
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).accentColor,
           ),
           decoration: InputDecoration(
-            labelStyle: TextStyle(color: Colors.white),
+            labelStyle: TextStyle(color: Theme.of(context).accentColor),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-                color: Colors.white,
+                color: Theme.of(context).accentColor
               ),
             ),
             hintText: "Enter your" + label,
@@ -311,19 +312,26 @@ class _EditProfileState extends State<EditProfile> {
       return Stack(
         children: <Widget>[
           CachedNetworkImage(
-                key: Key("myImage"),
-                imageBuilder: (context, imageProvider) => CircleAvatar(
-                  radius: 40,
-                  backgroundImage: imageProvider,
-                ),
-                imageUrl: _currentUser?.imageUrl ??
-                    "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
-                placeholder: (context, url) => Container(
-                  child: CircularProgressIndicator(),
-                ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+            key: Key("myImage"),
+            imageBuilder: (context, imageProvider) => CircleAvatar(
+              backgroundColor: Theme.of(context).primaryColor,
+              radius: 45,
+              child: CircleAvatar(
+                radius: 40,
+                backgroundImage: imageProvider,
               ),
-              Icon(FontAwesomeIcons.edit,color: Colors.purple,)
+            ),
+            imageUrl: _currentUser?.imageUrl ??
+                "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6",
+            placeholder: (context, url) => Container(
+              child: CircularProgressIndicator(),
+            ),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          ),
+          Icon(
+            FontAwesomeIcons.camera,
+            color: Colors.purple,
+          )
         ],
       );
     } else {

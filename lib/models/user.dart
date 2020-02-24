@@ -9,6 +9,9 @@ class User {
   final String gorvenmentId;
   final String imageUrl;
 
+  // calculates progress
+  int _progress = 0;
+
   User(this.name, this.id, this.email, this.phone, this.city, this.country,
       this.gorvenmentId, this.surname, this.imageUrl);
 
@@ -44,6 +47,8 @@ class User {
         _surname, _image);
   }
 
+  get progress => null;
+
   static toList(User user) {
     return [
       user.name,
@@ -56,6 +61,11 @@ class User {
       user.surname,
       user.imageUrl,
     ];
+  }
+
+  @override
+  String toString() {
+    return "firstname: $name, lastname: $surname , id: $id";
   }
 
   static List<User> get users => List.generate(30,

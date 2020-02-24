@@ -11,11 +11,11 @@ class Device {
 
   // converts a map from database to Device object
   factory Device.fromMap(Map map) {
-    String _identifier = map['identifier'];
-    String _ownerId = map["ownerId"];
-    String _name = map["name"];
-    String _type = map["type"] ?? '';
-    String _imei = map['imei'] ?? "";
+    String _identifier = map['identifier'] ?? '-';
+    String _ownerId = map["ownerId"] ?? "-";
+    String _name = map["name"] ?? '-';
+    String _type = map["type"] ?? '-';
+    String _imei = map['imei'] ?? "-";
     bool _confirmed = bool.fromEnvironment(map['confirmed'] ?? "false");
 
     return Device(

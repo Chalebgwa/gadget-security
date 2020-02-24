@@ -5,6 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+import 'package:flutter_sms/flutter_sms.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gsec/models/device.dart';
 
@@ -12,6 +15,7 @@ import 'package:gsec/models/user.dart';
 import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
+import 'package:gsec/widgets/device_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthState {
@@ -50,7 +54,7 @@ class Auth extends BaseProvider {
   String verificationId;
 
   Auth() {
-    checkLoginStatus();
+    //checkLoginStatus();
   }
 
   UserProvider get userProvider => _userProvider;
@@ -364,7 +368,7 @@ class Auth extends BaseProvider {
 
     String url = await uploadDocument(file, "/${device.identifier}/");
 
-    await _deviceProvider.addDevice(device,url: url);
+    await _deviceProvider.addDevice(device, url: url);
 
     _state = AuthState.SIGNED_IN;
     notifyListeners();
@@ -399,4 +403,26 @@ class Auth extends BaseProvider {
     return User.fromMap(ushot.data);
   }
 
+  Future<Action> confirmWithPin(String pin) async {
+    var doc = await firestore
+        .collection("security_info")
+        .document("${_currentUser.id}")
+        .get();
+    var data = doc.data;
+    if (pin == data["safe"]) {
+      return Action.OK;
+    } else if (pin == data["alert"]) {
+      return Action.ALERT;
+    } else {
+      return Action.NO;
+    }
+  }
+
+  void alertSecurity(User peer) {
+    sendSMS(
+      message: "I am in an emergency please contact the authorities\n " +
+          peer.toString(),
+      recipients: ["+26777147912"],
+    );
+  }
 }
