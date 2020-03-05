@@ -15,7 +15,6 @@ import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/views/commerce/advertise_screen.dart';
 import 'package:gsec/views/user_info.dart';
 import 'package:gsec/views/util/device_info.dart';
-import 'package:gsec/widgets/fancy_search.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
@@ -26,13 +25,25 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  
+  // for admob SDK
   String adId = "ca-app-pub-8858281741870053~7891966146";
+  
+  // string represented by QR code from device info
   String barcode = '';
+
+  // state controller
   Auth _auth;
+
+  // whether search should be active
   bool _searchActive = false;
+
+  // provides access to device info
   DeviceProvider _deviceProvider;
 
+  // controller for serial number search
   TextEditingController _controller = new TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +54,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _auth = Provider.of<Auth>(context);
     _deviceProvider = Provider.of<DeviceProvider>(context);
   }
@@ -52,6 +64,8 @@ class _DashboardState extends State<Dashboard> {
     super.dispose();
   }
 
+  /// search for devices by serial number [ssn]
+  /// displays the inforation of the matching user
   void searchBySSN(String ssn) async {
     User user = await _auth.searchDeviceById(ssn);
     if (user != null) {
@@ -60,7 +74,8 @@ class _DashboardState extends State<Dashboard> {
       Fluttertoast.showToast(msg: 'Owner not found');
     }
   }
-
+  
+  // build user's profile picture , if the user doesnt have a picture, use the default
   Widget _buildUserAvatar(User user) {
     return CachedNetworkImage(
       key: Key("myImage"),
@@ -127,130 +142,135 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    Auth _auth = Provider.of<Auth>(context);
-
-    return Page(
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        primary: true,
-        backgroundColor: Colors.transparent,
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: Container(
-                margin: EdgeInsets.all(10),
-                color: Theme.of(context).primaryColor.withOpacity(.4),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AdmobBanner(
-                    listener: (AdmobAdEvent e, _) {
-                      if (e == AdmobAdEvent.loaded) {}
-                    },
-                    adSize: AdmobBannerSize.LARGE_BANNER,
-                    adUnitId: BannerAd.testAdUnitId,
-                    onBannerCreated: (c) {},
-                  ),
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Container(
-                margin: EdgeInsets.only(
-                  right: 20,
-                  left: 20,
-                ),
-                child: TextField(
-                  onChanged: (value) {
-                    if (value.length > 0) {
-                      setState(() {
-                        _searchActive = true;
-                      });
-                    } else {
-                      setState(() {
-                        _searchActive = false;
-                      });
-                    }
-                  },
-                  controller: _controller,
-                  onSubmitted: (value) {
-                    if (_searchActive) {
-                      searchBySSN(value);
-                    }
-                  },
-                  decoration: InputDecoration(
-                    suffixIcon: FlatButton(
-                      highlightColor: Colors.purple,
-                      child: Icon(
-                        FontAwesomeIcons.search,
-                        color: _searchActive
-                            ? Colors.purple
-                            : Theme.of(context).accentColor,
-                      ),
-                      onPressed: _searchActive
-                          ? () {
-                              searchBySSN(_controller.text);
-                            }
-                          : null,
-                    ),
-                    hintText: 'Serial Number',
-                    hintStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).accentColor.withOpacity(.3)),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    fillColor: Theme.of(context).primaryColor,
-                    filled: true,
-                  ),
-                ),
-              ),
-            ),
-            SliverGrid.count(
-              crossAxisCount: 2,
-              children: <Widget>[
-                DashCard(
-                  label: "Device info",
-                  icon: Icons.info,
-                  ontap: () {
-                    showDeviceInfo(context);
-                  },
-                ),
-                DashCard(
-                  label: "Scan device",
-                  icon: Icons.camera,
-                  ontap: () {
-                    navigateToScanner(context);
-                  },
-                ),
-                DashCard(
-                  label: "Donate",
-                  icon: FontAwesomeIcons.donate,
-                  ontap: () {
-                    navigateToDonate(context);
-                  },
-                ),
-                DashCard(
-                  label: "Premium",
-                  icon: FontAwesomeIcons.moneyBill,
-                  ontap: true
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Advertiser(),
-                            ),
-                          );
-                        },
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
+  
+    return CustomScrollView(
+      slivers: <Widget>[
+        _buildAdBox(context),
+        _buildSearchField(context),
+        _buildGrid(context),
+      ],
     );
   }
+
+  SliverGrid _buildGrid(BuildContext context) {
+    return SliverGrid.count(
+          crossAxisCount: 2,
+          children: <Widget>[
+            DashCard(
+              label: "Device info",
+              icon: Icons.info,
+              ontap: () {
+                showDeviceInfo(context);
+              },
+            ),
+            DashCard(
+              label: "Scan device",
+              icon: Icons.camera,
+              ontap: () {
+                navigateToScanner(context);
+              },
+            ),
+            DashCard(
+              label: "Donate",
+              icon: FontAwesomeIcons.donate,
+              ontap: () {
+                navigateToDonate(context);
+              },
+            ),
+            DashCard(
+              label: "Premium",
+              icon: FontAwesomeIcons.moneyBill,
+              ontap: true
+                  ? null
+                  : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Advertiser(),
+                        ),
+                      );
+                    },
+            )
+          ],
+        );
+  }
+
+  SliverToBoxAdapter _buildSearchField(BuildContext context) {
+    return SliverToBoxAdapter(
+          child: Container(
+            margin: EdgeInsets.only(
+              right: 20,
+              left: 20,
+            ),
+            child: TextField(
+              onChanged: (value) {
+                if (value.length > 0) {
+                  setState(() {
+                    _searchActive = true;
+                  });
+                } else {
+                  setState(() {
+                    _searchActive = false;
+                  });
+                }
+              },
+              controller: _controller,
+              onSubmitted: (value) {
+                if (_searchActive) {
+                  searchBySSN(value);
+                }
+              },
+              decoration: InputDecoration(
+                suffixIcon: FlatButton(
+                  highlightColor: Colors.purple,
+                  child: Icon(
+                    FontAwesomeIcons.search,
+                    color: _searchActive
+                        ? Colors.purple
+                        : Theme.of(context).accentColor,
+                  ),
+                  onPressed: _searchActive
+                      ? () {
+                          searchBySSN(_controller.text);
+                        }
+                      : null,
+                ),
+                hintText: 'Serial Number',
+                hintStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).accentColor.withOpacity(.3)),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                fillColor: Theme.of(context).primaryColor,
+                filled: true,
+              ),
+            ),
+          ),
+        );
+  }
+
+  SliverToBoxAdapter _buildAdBox(BuildContext context) {
+    return SliverToBoxAdapter(
+          child: Container(
+            margin: EdgeInsets.all(10),
+            color: Theme.of(context).primaryColor.withOpacity(.4),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AdmobBanner(
+                listener: (AdmobAdEvent e, _) {
+                  if (e == AdmobAdEvent.loaded) {}
+                },
+                adSize: AdmobBannerSize.LARGE_BANNER,
+                adUnitId: BannerAd.testAdUnitId,
+                onBannerCreated: (c) {},
+              ),
+            ),
+          ),
+        );
+  }
+  
 }
 
 class DashCard extends StatelessWidget {

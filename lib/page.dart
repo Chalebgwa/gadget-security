@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/settings_provider.dart';
 import 'package:gsec/views/loading_screen.dart';
+import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:provider/provider.dart';
 
 // wraps every screen in the app
@@ -27,7 +28,8 @@ class _PageState extends State<Page> {
   void initState() {
     super.initState();
     SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown],
+    );
   }
 
   @override
@@ -41,35 +43,25 @@ class _PageState extends State<Page> {
 
   @override
   Widget build(BuildContext context) {
-    return _authState == AuthState.SAFE_LOADING
-        ? Center(
-            child: LoadingScreen(),
-          )
-        : SafeArea(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                    "assets/back3.jpg",
-                  ),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              child: Scaffold(
-                key: _globalKey,
-                floatingActionButton: widget.fab,
-                backgroundColor: Colors.transparent,
-                resizeToAvoidBottomInset: true,
-                body: Container(
-                  decoration: BoxDecoration(
-                      //color: Colors.black.withOpacity(.3),
-                      ),
-                  margin:
-                      EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 10),
-                  child: widget.child,
-                ),
-              ),
+    if (_authState == AuthState.SAFE_LOADING) {
+      return Center(
+        child: LoadingScreen(),
+      );
+    } else {
+      return Container(
+        //constraints: ,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              "assets/back3.jpg",
             ),
-          );
+            fit: BoxFit.fill,
+          ),
+        ),
+        child: KeyboardAvoider(
+          child: widget.child,
+        ),
+      );
+    }
   }
 }

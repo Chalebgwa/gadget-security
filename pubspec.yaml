@@ -17,6 +17,9 @@ environment:
   sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
+  keyboard_avoider: ^0.1.2
+  rxdart: ^0.23.1
+  flutter_local_notifications: ^1.2.0+3
   flutter_sms: ^2.0.0+2
   file_picker:
   #tesseract_ocr: #^0.3.0

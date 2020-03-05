@@ -102,6 +102,7 @@ class _DeviceCardState extends State<DeviceCard> {
             content: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: _pinController,
                 decoration: InputDecoration(
                   hintText: "Type In Security Pin",
                 ),
@@ -114,7 +115,7 @@ class _DeviceCardState extends State<DeviceCard> {
                 onPressed: () async {
                   if (_pinController.text.length > 0) {
                     _auth.confirmWithPin(_pinController.text);
-                    Navigator.pop(context, Action.OK);
+                    Navigator.pop(context, Action.ALERT);
                   }
                 },
               ),
@@ -173,38 +174,39 @@ class _DeviceCardState extends State<DeviceCard> {
   Container buildListHeader() {
     return Container(
       color: Theme.of(context).accentColor,
-      child: IconTheme(
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Icon(
-                FontAwesomeIcons.checkCircle,
-                color: widget.device.confirmed
-                    ? Colors.green
-                    : Theme.of(context).primaryColor,
-              ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Icon(
+              FontAwesomeIcons.checkCircle,
+              color: widget.device.confirmed
+                  ? Colors.green
+                  : Theme.of(context).primaryColor,
             ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(FontAwesomeIcons.exchangeAlt),
-                onPressed: getUser,
-              ),
+          ),
+          Expanded(
+            child: IconButton(
+              color: Theme.of(context).primaryColor,
+              icon: Icon(FontAwesomeIcons.exchangeAlt),
+              onPressed: getUser,
             ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: deleteDevice,
-              ),
+          ),
+          Expanded(
+            
+            child: IconButton(
+              color: Theme.of(context).primaryColor,
+              icon: Icon(Icons.delete),
+              onPressed: deleteDevice,
             ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: deleteDevice,
-              ),
+          ),
+          Expanded(
+            child: IconButton(
+              color: Theme.of(context).primaryColor,
+              icon: Icon(Icons.edit),
+              onPressed: deleteDevice,
             ),
-          ],
-        ),
-        data: IconThemeData(color: Colors.white),
+          ),
+        ],
       ),
     );
   }
@@ -212,56 +214,73 @@ class _DeviceCardState extends State<DeviceCard> {
   Widget buildListDetail(String label, String detail) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Text(
-            label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          Text(
-            detail,
-            style: TextStyle(fontSize: 15),
-          ),
-          Divider()
-        ],
+      child: Container(
+        color: Theme.of(context).primaryColor,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text(
+              label,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+            Text(
+              detail,
+              style: TextStyle(fontSize: 15),
+            ),
+            Divider()
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).primaryColor,
-      elevation: 10,
-      child: InkWell(
-        onTap: () {
-          _showDeviceInfo(context);
-        },
-        child: Center(
-          child: SizedBox(
-            width: 90,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  widget.device.name,
-                  style: TextStyle(
-                    color: Theme.of(context).accentColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(5,5),
+                  color: Theme.of(context).accentColor.withOpacity(0.1),
+                  blurRadius: 1),
+              BoxShadow(
+                  offset: Offset(-5, -5),
+                  color: Theme.of(context).accentColor.withOpacity(.1),
+                  blurRadius: 1),
+            ]),
+        child: InkWell(
+          onTap: () {
+            _showDeviceInfo(context);
+          },
+          child: Center(
+            child: SizedBox(
+              width: 90,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    widget.device.name,
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  "Laptop",
-                  style: TextStyle(
-                    color: Theme.of(context).accentColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                  Text(
+                    "Laptop",
+                    style: TextStyle(
+                      color: Theme.of(context).accentColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

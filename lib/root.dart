@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gsec/providers/auth_provider.dart';
-import 'package:gsec/views/dashboard.dart';
 import 'package:gsec/views/loading_screen.dart';
+import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:provider/provider.dart';
 
 import 'fancy_drawer.dart';
@@ -15,12 +15,8 @@ class Root extends StatefulWidget {
 class _RootState extends State<Root> {
   Auth _auth;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    //_auth.checkLoginStatus();
-  }
+  final mainView = FancyDrawer();
+  final loadingScreen = LoadingScreen();
 
   @override
   void didChangeDependencies() {
@@ -30,28 +26,13 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    var screen;
+    final bottom = MediaQuery.of(context).viewInsets.bottom;
 
     
-
-    setState(() {
-      
-    });
-
-    switch (_auth.state) {
-      case AuthState.SIGNED_OUT:
-        screen = FancyDrawer();
-        break;
-      case AuthState.LOADING:
-        screen = LoadingScreen();
-        break;
-      case AuthState.SIGNED_IN:
-        screen = FancyDrawer();
-        break;
-      default:
-        return FancyDrawer();
+    if (_auth.state == AuthState.LOADING) {
+      return loadingScreen;
+    } else {
+      return mainView;
     }
-
-    return screen;
   }
 }

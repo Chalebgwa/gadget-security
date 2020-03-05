@@ -1,10 +1,17 @@
+import 'dart:ui';
+
+/**
+ * 
+ */
+
 import 'package:bouncing_widget/bouncing_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gsec/models/user.dart';
+import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/settings_provider.dart';
-import 'package:gsec/views/authentication/authentication.dart';
 import 'package:gsec/views/dashboard.dart';
 import 'package:gsec/views/profile/profile.dart';
 import 'package:gsec/views/settings.dart';
@@ -17,9 +24,13 @@ class FancyDrawer extends StatefulWidget {
 }
 
 class _FancyDrawerState extends State<FancyDrawer> {
-  // Authentication
+  // controller state
   Auth _auth;
+
+  // provides to app settings
   SettingsProvider _settings;
+
+  // Screen in focus
   Widget screen = Dashboard();
 
   @override
@@ -34,27 +45,20 @@ class _FancyDrawerState extends State<FancyDrawer> {
 
     switch (index) {
       case 0:
-        setState(() {
-          screen = Dashboard();
-        });
+        screen = Dashboard();
 
         break;
       case 1:
-        setState(() {
-          screen = Settings();
-        });
+        screen = Settings();
 
         break;
       case 2:
-        setState(() {
-          screen = Profile();
-        });
+        screen = Profile();
+
         break;
       case 3:
         _auth.signOut();
-        setState(() {
-          screen = Dashboard();
-        });
+        screen = Dashboard();
 
         break;
 
@@ -68,15 +72,7 @@ class _FancyDrawerState extends State<FancyDrawer> {
         if (index == 0) {
           return true;
         }
-
-        controller.toggle();
-        SimpleHiddenDrawerProvider.of(context)
-            .controllers
-            .setPositionSelected(0);
-        controller.toggle();
-        setState(() {
-          screen = Dashboard();
-        });
+        print("back pressed");
 
         return false;
       },
@@ -99,7 +95,8 @@ class _FancyDrawerState extends State<FancyDrawer> {
             },
           ),
         ),
-        body: screen,
+        body: Page(child: screen),
+        resizeToAvoidBottomInset: true,
       ),
     );
   }
@@ -107,10 +104,16 @@ class _FancyDrawerState extends State<FancyDrawer> {
   @override
   Widget build(BuildContext context) {
     return SimpleHiddenDrawer(
+      isDraggable: true,
+
+      slidePercent: 80,
       typeOpen:
           _settings.isLeftHanded ? TypeOpen.FROM_LEFT : TypeOpen.FROM_RIGHT,
       menu: Menu(),
+      curveAnimation: Curves.bounceIn,
       screenSelectedBuilder: screenBuilder,
+      //enableScaleAnimin: true,
+      verticalScalePercent: 100,
     );
   }
 
@@ -162,9 +165,7 @@ class _FancyDrawerState extends State<FancyDrawer> {
     Navigator.pushNamed(context, '/auth');
   }
 
-  void _signOut() {
-    _auth.signOut();
-  }
+  
 }
 
 class Menu extends StatefulWidget {
@@ -177,12 +178,14 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
   bool initConfigState = false;
   Auth _auth;
   SettingsProvider _settings;
+  User _currentUser;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _auth = Provider.of<Auth>(context);
     _settings = Provider.of<SettingsProvider>(context);
+    _currentUser = _auth.currentUser;
   }
 
   @override
@@ -209,35 +212,86 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
         child: Container(
           width: double.maxFinite,
           height: double.maxFinite,
-          color: Colors.cyan,
           child: Stack(
             children: <Widget>[
               Container(
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  child: Image.asset(
-                    'assets/back3.jpg',
-                    fit: BoxFit.cover,
-                  )),
-              FadeTransition(
-                opacity: _animationController,
+                width: double.maxFinite,
+                height: double.maxFinite,
+                child: Image.asset(
+                  'assets/back3.jpg',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Align(
                     alignment: _settings.isLeftHanded
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        buildDrawerButton(context, 0, 'Dashboard'),
-                        buildDrawerButton(context, 1, 'Settings'),
-                        if (_auth.state == AuthState.SIGNED_IN)
-                          buildDrawerButton(context, 2, 'Profile'),
-                        if (_auth.state == AuthState.SIGNED_IN)
-                          buildDrawerButton(context, 3, 'Logout'),
-                      ],
+                    child: SizedBox(
+                      width: 250,
+                      child: CustomScrollView(
+                        slivers: <Widget>[
+                          if (_currentUser != null)
+                            SliverToBoxAdapter(
+                              child: Column(
+                                children: <Widget>[
+                                  CachedNetworkImage(
+                                    height: 70,
+                                    width: 70,
+                                    imageUrl: _currentUser.imageUrl,
+                                    imageBuilder: (context, provider) {
+                                      return CircleAvatar(
+                                        backgroundColor:
+                                            Theme.of(context).primaryColor,
+                                        radius: 50,
+                                        child: CircleAvatar(
+                                          radius: 40,
+                                          backgroundImage: provider,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Text(
+                                      "${_currentUser.name} ${_currentUser.surname}",
+                                      style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize: 20,
+                                          decoration: TextDecoration.underline),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: Text(
+                                      "${_currentUser.city},${_currentUser.country}",
+                                      style: TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          //fontSize: 30,
+                                          decoration: TextDecoration.underline),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          SliverGrid(
+                            delegate: SliverChildListDelegate(
+                              _buildChildren(context),
+                            ),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              //childAspectRatio: .5
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -261,25 +315,51 @@ class _MenuState extends State<Menu> with TickerProviderStateMixin {
     );
   }
 
-  Widget buildDrawerButton(BuildContext context, int index, String title) {
-    return BouncingWidget(
-      child: SizedBox(
-        width: 200.0,
-        child: RaisedButton(
-          color: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0))),
-          onPressed: () {
-            SimpleHiddenDrawerProvider.of(context)
-                .setSelectedMenuPosition(index);
-          },
-          child: Text(
-            title,
-            style: TextStyle(color: Theme.of(context).accentColor),
-          ),
+  List<Widget> _buildChildren(BuildContext context) {
+    if (_auth.state == AuthState.SIGNED_IN) {
+      return [
+        buildDrawerButton(context, 0, "Home", Icons.home),
+        buildDrawerButton(context, 1, "Settings", Icons.settings),
+        buildDrawerButton(context, 2, "Profile", Icons.verified_user),
+        buildDrawerButton(context, 3, "Sign out", FontAwesomeIcons.signOutAlt),
+        buildDrawerButton(context, 4, "Emergency", FontAwesomeIcons.phoneAlt),
+      ];
+    } else {
+      return [
+        buildDrawerButton(context, 0, "Home", Icons.home),
+        buildDrawerButton(context, 1, "Settings", Icons.settings),
+      ];
+    }
+  }
+
+  Widget buildDrawerButton(
+      BuildContext context, int index, String title, IconData iconData) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withOpacity(.4),
+        //shape: BoxShape.circle,
+      ),
+      child: InkWell(
+        splashColor: Theme.of(context).accentColor,
+        onTap: () {
+          SimpleHiddenDrawerProvider.of(context).setSelectedMenuPosition(index);
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              iconData,
+              size: 30,
+            ),
+            Text(
+              title,
+              style: TextStyle(color: Theme.of(context).accentColor),
+            ),
+          ],
         ),
       ),
-      onPressed: () {},
     );
   }
 

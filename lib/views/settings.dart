@@ -1,6 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gsec/page.dart';
 import 'package:gsec/providers/settings_provider.dart';
+import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
@@ -14,6 +16,7 @@ class _SettingsState extends State<Settings> {
   bool _isLeftHanded = false;
   bool _isDarkThemed = false;
   SettingsProvider _settingsProvider;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -39,8 +42,10 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Page(
-      child: ListView(
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: ListView(
+        controller: _scrollController,
         children: <Widget>[
           buildSettingsCard(
               'Gestures', 'switch to left hand', saveHand, _isLeftHanded),
@@ -61,15 +66,37 @@ class _SettingsState extends State<Settings> {
                     ),
                   ),
                 ),
-                _buildTextField("PIN", ""),
-                _buildTextField("Emergency Number", ""),
-                _buildTextField("Next of Kin Number", ""),
+                ListTile(
+                  title: Text("Pin"),
+                  trailing: Icon(Icons.edit),
+                  onTap: () {},
+                ),
+                ListTile(
+                  title: Text("Pin"),
+                  trailing: Icon(Icons.edit),
+                  onTap: showPinDialog,
+                ),
+                ListTile(
+                  title: Text("Emergency Contact"),
+                  trailing: Icon(Icons.edit),
+                  onTap: () {},
+                ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  showPinDialog() {
+    AwesomeDialog(
+        dialogType: DialogType.INFO,
+        context: context,
+        animType: AnimType.SCALE,
+        body: TextField(
+          decoration: InputDecoration(hintText: "Type in Pin"),
+        )).show();
   }
 
   Widget _buildTextField(hint, controller) {

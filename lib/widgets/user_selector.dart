@@ -105,30 +105,31 @@ class _UserSelectorState extends State<UserSelector> {
 
   @override
   Widget build(BuildContext context) {
-    return Page(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: _controller,
-              onSubmitted: onSubmit,
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-              
-                border: OutlineInputBorder(),
-                hintText: "Enter User ID",
-                fillColor: Colors.white,
-                filled: true,
-              ),
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      primary: true,
+          body: Column(
+            
+        //direction: Axis.vertical,
+        //mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          TextField(
+            controller: _controller,
+            onSubmitted: onSubmit,
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: "Enter User ID",
+              fillColor: Colors.white,
+              filled: true,
             ),
-            RaisedButton(
+          ),
+          RaisedButton(
                 child: Text("Search"),
                 onPressed: () {
                   onSubmit(_controller.text);
                 })
-          ],
-        ),
+        ],
       ),
     );
   }

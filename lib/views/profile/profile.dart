@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/models/device.dart';
 import 'package:gsec/models/user.dart';
-import 'package:gsec/page.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/widgets/device_card.dart';
 import 'package:gsec/widgets/fancy_header.dart';
-import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 import 'package:provider/provider.dart';
 
@@ -47,7 +45,7 @@ class _ProfileState extends State<Profile> {
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: theme.primaryColor.withOpacity(.0),
+          color: theme.primaryColor.withOpacity(.9),
           child: SingleChildScrollView(
             //padding: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
@@ -84,29 +82,32 @@ class _ProfileState extends State<Profile> {
                           ? Text(
                               "No registered devices",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).accentColor
                               ),
                             )
-                          : GridView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              primary: false,
-                              padding: EdgeInsets.all(5),
-                              itemCount: snapshot
-                                  .data.documents.length, //_devices.length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                              ),
-                              itemBuilder: (BuildContext context, int index) {
-                                DocumentSnapshot shot =
-                                    snapshot.data.documents[index];
+                          : Container(
+                            color: Theme.of(context).primaryColor.withOpacity(.1),
+                            child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                primary: false,
+                                padding: EdgeInsets.all(5),
+                                itemCount: snapshot
+                                    .data.documents.length, //_devices.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  DocumentSnapshot shot =
+                                      snapshot.data.documents[index];
 
-                                return new DeviceCard(
-                                  device: Device.fromMap(shot.data),
-                                );
-                              },
-                            ),
+                                  return new DeviceCard(
+                                    device: Device.fromMap(shot.data),
+                                  );
+                                },
+                              ),
+                          ),
                     );
                   },
                 ),

@@ -409,11 +409,16 @@ class Auth extends BaseProvider {
         .document("${_currentUser.id}")
         .get();
     var data = doc.data;
-    if (pin == data["safe"]) {
-      return Action.OK;
-    } else if (pin == data["alert"]) {
-      return Action.ALERT;
+    if (data != null) {
+      if (pin == data["safe"]) {
+        return Action.OK;
+      } else if (pin == data["alert"]) {
+        return Action.ALERT;
+      } else {
+        return Action.NO;
+      }
     } else {
+      Fluttertoast.showToast(msg: "PIN NOT SET");
       return Action.NO;
     }
   }
