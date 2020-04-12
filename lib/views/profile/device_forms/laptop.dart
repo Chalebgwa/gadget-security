@@ -37,13 +37,7 @@ class _LaptopFormState extends State<LaptopForm> {
     var _name = _deviceNameController.text;
     var id = _auth.currentUser.id;
 
-    Device _device = Device(
-      _ssn,
-      id,
-      _name,
-      confirmed: false,
-      imei: _imei,
-    );
+    Device _device = Device(_ssn,id,_name,imei: _imei,confirmed: true,type:"laptop");
 
     await _auth.addDevice(_device, file);
     Navigator.pop(context);

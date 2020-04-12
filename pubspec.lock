@@ -169,6 +169,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.4"
+  country_pickers:
+    dependency: "direct main"
+    description:
+      name: country_pickers
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   crypto:
     dependency: transitive
     description:
@@ -204,6 +211,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.1+5"
+  fa_stepper:
+    dependency: "direct main"
+    description:
+      name: fa_stepper
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2"
   file_picker:
     dependency: "direct main"
     description:
@@ -314,6 +328,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.6"
+  flutter_share:
+    dependency: "direct main"
+    description:
+      name: flutter_share
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2+1"
   flutter_signin_button:
     dependency: "direct main"
     description:
@@ -478,6 +499,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.8"
+  mobile_number:
+    dependency: "direct main"
+    description:
+      name: mobile_number
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   nested:
     dependency: transitive
     description:
@@ -583,6 +611,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.0"
+  qrscan:
+    dependency: "direct main"
+    description:
+      name: qrscan
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.17"
   quiver:
     dependency: transitive
     description:
@@ -597,6 +632,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.0"
+  settings_ui:
+    dependency: "direct main"
+    description:
+      name: settings_ui
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -625,6 +667,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2+4"
+  sim_info:
+    dependency: "direct main"
+    description:
+      name: sim_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1"
   simple_animations:
     dependency: transitive
     description:

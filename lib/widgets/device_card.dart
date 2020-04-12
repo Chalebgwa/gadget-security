@@ -1,269 +1,199 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/models/device.dart';
-import 'package:gsec/models/user.dart';
-import 'package:gsec/providers/auth_provider.dart';
-import 'package:gsec/providers/device_provider.dart';
-import 'package:gsec/widgets/user_selector.dart';
-import 'package:provider/provider.dart';
-
-enum Action { NO, OK, ALERT }
+import 'package:gsec/pages/device_view.dart';
+import 'package:gsec/pages/page.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class DeviceCard extends StatefulWidget {
-  final Device device;
+  const DeviceCard({Key key, this.device}) : super(key: key);
 
-  const DeviceCard({
-    Key key,
-    this.device,
-  }) : super(key: key);
+  final Device device;
 
   @override
   _DeviceCardState createState() => _DeviceCardState();
 }
 
 class _DeviceCardState extends State<DeviceCard> {
-  Auth _auth;
-  DeviceProvider _deviceProvider;
-  TextEditingController _pinController = TextEditingController();
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _auth = Provider.of<Auth>(context);
-    _deviceProvider = Provider.of<DeviceProvider>(context);
-  }
-
-  void getUser() async {
-    Navigator.pop(context);
-    var route = MaterialPageRoute<User>(builder: (context) => UserSelector());
-    User peer = await Navigator.push<User>(context, route);
-    if (peer != null) {
-      var action = await pinConfirm(peer);
-      print(action);
-      switch (action) {
-        case Action.OK:
-          _auth.transfer(peer, widget.device);
-          break;
-        case Action.NO:
-          break;
-        case Action.ALERT:
-          _auth.alertSecurity(peer);
-          break;
-        default:
-      }
-    }
-  }
-
-  Future<Action> showConfirmDialog(String action, {User peer}) async {
-    String content = '';
-    if (action != 'trade') {
-      content = "Are you sure want to delete ${widget.device.name}";
-    } else {
-      content =
-          "Are you sure want to trade ${widget.device.name} with ${peer.name}";
-    }
-
-    return showDialog<Action>(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text("Warning"),
-            content: Text(content),
-            backgroundColor: Theme.of(context).primaryColor,
-            actions: <Widget>[
-              FlatButton(
-                child: Text("Yes"),
-                onPressed: () {
-                  Navigator.pop(context, Action.OK);
-                },
-              ),
-              FlatButton(
-                child: Text("No"),
-                onPressed: () {
-                  Navigator.pop(context, Action.NO);
-                },
-              ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40),
-            ),
-          );
-        });
-  }
-
-  Future<Action> pinConfirm(User peer) async {
-    String content = '';
-
-    return showDialog<Action>(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text("Type in Security Pin"),
-            content: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Type In Security Pin",
-                ),
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                color: Theme.of(context).accentColor,
-                child: Text("Yes"),
-                onPressed: () async {
-                  if (_pinController.text.length > 0) {
-                    _auth.confirmWithPin(_pinController.text);
-                    Navigator.pop(context, Action.OK);
-                  }
-                },
-              ),
-              FlatButton(
-                color: Theme.of(context).accentColor,
-                child: Text("No"),
-                onPressed: () {
-                  Navigator.pop(context, Action.NO);
-                },
-              ),
-            ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40),
-            ),
-          );
-        });
-  }
-
-  void deleteDevice() async {
-    Navigator.pop(context);
-    var action = await showConfirmDialog("delete");
-    switch (action) {
-      case Action.OK:
-        _deviceProvider.removeDevice(widget.device);
-        break;
-      case Action.NO:
-        break;
-      default:
-    }
-    //
-  }
-
-  void _showDeviceInfo(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return SingleChildScrollView(
-            child: Container(
-              color: Colors.grey.shade200,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  buildListHeader(),
-                  buildListDetail("SSN", widget.device.identifier),
-                  buildListDetail("NAME", widget.device.name ?? "-"),
-                  buildListDetail("IMEI", widget.device.imei ?? "-"),
-                  buildListDetail("TYPE", widget.device.type ?? "-"),
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
-  Container buildListHeader() {
-    return Container(
-      color: Theme.of(context).accentColor,
-      child: IconTheme(
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Icon(
-                FontAwesomeIcons.checkCircle,
-                color: widget.device.confirmed
-                    ? Colors.green
-                    : Theme.of(context).primaryColor,
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(FontAwesomeIcons.exchangeAlt),
-                onPressed: getUser,
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: deleteDevice,
-              ),
-            ),
-            Expanded(
-              child: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: deleteDevice,
-              ),
-            ),
-          ],
-        ),
-        data: IconThemeData(color: Colors.white),
-      ),
-    );
-  }
-
-  Widget buildListDetail(String label, String detail) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Text(
-            label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          ),
-          Text(
-            detail,
-            style: TextStyle(fontSize: 15),
-          ),
-          Divider()
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).primaryColor,
-      elevation: 10,
-      child: InkWell(
-        onTap: () {
-          _showDeviceInfo(context);
-        },
-        child: Center(
-          child: SizedBox(
-            width: 90,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    var labelStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 10,
+      //decoration: TextDecoration.underline
+    );
+    var valuetextStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w100,
+      fontSize: 15,
+    );
+    return InkWell(
+      onTap: () {
+        var route = animateRoute(
+          context: context,
+          page: DeviceView(),
+        );
+        Navigator.push(context, route);
+        print("hello");
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Text(
-                  widget.device.name,
-                  style: TextStyle(
-                    color: Theme.of(context).accentColor,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                QrImage(
+                  data: "1232568565",
+                  foregroundColor: Colors.white,
+                  gapless: true,
+                  size: 150,
                 ),
-                Text(
-                  "Laptop",
-                  style: TextStyle(
-                    color: Theme.of(context).accentColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text(
+                        "Device Name",
+                        style: labelStyle,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text(
+                        "SAMSUNG-J2FU",
+                        style: valuetextStyle,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text(
+                        "Device Serial",
+                        style: labelStyle,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text("1002-5966-263-5", style: valuetextStyle),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text(
+                        "Device Type",
+                        style: labelStyle,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(1.0),
+                      child: Text(
+                        "mobile",
+                        style: valuetextStyle,
+                      ),
+                    ),
+                    Divider()
+                  ],
                 ),
               ],
             ),
           ),
+          Divider(
+            color: Colors.white,
+            endIndent: 10,
+            indent: 10,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PrimaryDevice extends StatelessWidget {
+  const PrimaryDevice({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var labelStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 10,
+      //decoration: TextDecoration.underline
+    );
+    var valuetextStyle = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w100,
+      fontSize: 15,
+    );
+
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        height: 300,
+        width: double.infinity,
+        color: Colors.black.withOpacity(.3),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Primary Device",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                QrImage(
+                  data: "1233",
+                  size: 100,
+                  backgroundColor: Colors.white,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Device",
+                      style: labelStyle,
+                    ),
+                    Text(
+                      "Device",
+                      style: valuetextStyle,
+                    ),
+                    Text(
+                      "Device",
+                      style: labelStyle,
+                    ),
+                    Text(
+                      "Device",
+                      style: valuetextStyle,
+                    ),
+                    Text(
+                      "Device",
+                      style: labelStyle,
+                    ),
+                    Text(
+                      "Device",
+                      style: valuetextStyle,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );
