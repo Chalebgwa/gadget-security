@@ -1,6 +1,16 @@
 # GADGET SECURITY
+
 A flutter mobile application for serves the following:
-* Proof of ownership
+
+![](assets/gs.gif)
+
+## Features included
+* Proof of ownership using pin and qr code
 * Trading devices amongst peers
 * Security alerts for stolen devices
-* Peer to peer chats 
+* Peer to peer chats
+
+## Designed By
+![](assets/tag.jpg)
+
+
