@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gsec/page.dart';
 
-
-
 @deprecated
 class Advertiser extends StatefulWidget {
   Advertiser({Key key}) : super(key: key);
@@ -15,18 +13,14 @@ class _AdvertiserState extends State<Advertiser> {
   Package startup = Package();
   Package premium = Package();
   Package custom = Package();
-  
 
-
-
-  void purchasePackage(Package package){
+  void purchasePackage(Package package) {
     showDialog(
       context: context,
-      builder: (context)=>SimpleDialog(
+      builder: (context) => SimpleDialog(
         children: <Widget>[
           TextField(),
           TextField(),
-
         ],
       ),
     );
@@ -105,10 +99,9 @@ class _AdvertiserState extends State<Advertiser> {
     return Expanded(
       child: Card(
         shape: StadiumBorder(
-          side: BorderSide(
-            //color: Theme.of(context).accentColor
-          )
-        ),
+            side: BorderSide(
+                //color: Theme.of(context).accentColor
+                )),
         color: Theme.of(context).primaryColor.withOpacity(.4),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -129,12 +122,10 @@ class _AdvertiserState extends State<Advertiser> {
             for (var text in package.benefits)
               Text(
                 text,
-                style: TextStyle(
-                  color: Theme.of(context).accentColor
-                ),
+                style: TextStyle(color: Theme.of(context).accentColor),
               ),
             RaisedButton(
-              onPressed: (){},
+              onPressed: () {},
               child: Text("Buy"),
               color: Theme.of(context).primaryColor,
               shape: StadiumBorder(),

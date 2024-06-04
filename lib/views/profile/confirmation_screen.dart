@@ -90,19 +90,18 @@ class _ConfirmDeviceState extends State<ConfirmDevice> {
       appBar: AppBar(
         title: Text("Add Device Reciept"),
         actions: <Widget>[
-          if (file != null)
-            IconButton(
-              icon: Icon(FontAwesomeIcons.check),
-              onPressed: () {
-                Navigator.pop(context,file);
-              },
-            )
+          IconButton(
+            icon: Icon(FontAwesomeIcons.check),
+            onPressed: () {
+              Navigator.pop(context, file);
+            },
+          )
         ],
       ),
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        child: file != null && !isPdf
+        child: !isPdf
             ? Image.file(
                 file,
                 fit: BoxFit.fitHeight,

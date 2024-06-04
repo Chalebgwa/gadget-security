@@ -18,11 +18,11 @@ class DeviceProvider extends BaseProvider {
   Map<String, String> get details => _details;
 
   /// Device owner info
-  User _owner;
-  User get owner => _owner;
+  Client _owner;
+  Client get owner => _owner;
 
   /// returns the device's owner using [ssn] as the indetifier
-  Future<User> fetchUser() async {
+  Future<Client> fetchUser() async {
     try {
       var did = _details['identifier'];
 
@@ -40,7 +40,7 @@ class DeviceProvider extends BaseProvider {
 
         var map = docSnap.data;
 
-        return User.fromMap(map);
+        return Client.fromMap(map);
       }
 
       // return nothing if user not registered
@@ -112,7 +112,7 @@ class DeviceProvider extends BaseProvider {
         .setData(_details);
   }
 
-  Future<void> transfer(User to, Device device) async {
+  Future<void> transfer(Client to, Device device) async {
     await firestore
         .collection("devices")
         .document(device.identifier)

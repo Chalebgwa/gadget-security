@@ -30,7 +30,7 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   File image;
   Auth _auth;
-  User _currentUser;
+  Client _currentUser;
   bool _isLoadingImage = false;
 
   TextEditingController _nameController = new TextEditingController();
@@ -137,9 +137,7 @@ class _EditProfileState extends State<EditProfile> {
           initAspectRatio: CropAspectRatioPreset.original,
           lockAspectRatio: false),
     );
-    if (croppedFile != null) {
-      return croppedFile;
-    }
+    return croppedFile;
     return file;
   }
 
@@ -214,7 +212,10 @@ class _EditProfileState extends State<EditProfile> {
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("User Details",style: TextStyle(color: Theme.of(context).accentColor),),
+              title: Text(
+                "User Details",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
             ),
           ),
         ),
@@ -240,7 +241,10 @@ class _EditProfileState extends State<EditProfile> {
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("Location",style: TextStyle(color: Theme.of(context).accentColor),),
+              title: Text(
+                "Location",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
             ),
           ),
         ),
@@ -265,7 +269,10 @@ class _EditProfileState extends State<EditProfile> {
           child: ListTileTheme(
             style: ListTileStyle.list,
             child: ListTile(
-              title: Text("Contacts",style: TextStyle(color: Theme.of(context).accentColor),),
+              title: Text(
+                "Contacts",
+                style: TextStyle(color: Theme.of(context).accentColor),
+              ),
             ),
           ),
         ),
@@ -295,9 +302,7 @@ class _EditProfileState extends State<EditProfile> {
           decoration: InputDecoration(
             labelStyle: TextStyle(color: Theme.of(context).accentColor),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Theme.of(context).accentColor
-              ),
+              borderSide: BorderSide(color: Theme.of(context).accentColor),
             ),
             hintText: "Enter your" + label,
             labelText: label,

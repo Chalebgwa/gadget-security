@@ -6,7 +6,7 @@ import 'package:gsec/page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserInfo extends StatelessWidget {
-  final User user;
+  final Client user;
   const UserInfo({Key key, this.user}) : super(key: key);
 
   @override
@@ -77,7 +77,7 @@ class UserInfo extends StatelessWidget {
     );
   }
 
-  Stack buildUserAvatar(User user) {
+  Stack buildUserAvatar(Client user) {
     return Stack(
       children: <Widget>[
         CachedNetworkImage(

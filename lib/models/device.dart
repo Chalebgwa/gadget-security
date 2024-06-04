@@ -7,7 +7,7 @@ class Device {
   final bool confirmed;
 
   Device(this.identifier, this.ownerId, this.name,
-      {this.type, this.imei, this.confirmed = false});
+      {required this.type, required this.imei, this.confirmed = false});
 
   // converts a map from database to Device object
   factory Device.fromMap(Map map) {
@@ -28,8 +28,8 @@ class Device {
     );
   }
 
-  static List<Device> get devices =>
-      List<Device>.generate(5, (i) => Device("$i", "001", "device $i"));
+  static List<Device> get devices => List<Device>.generate(
+      5, (i) => Device("$i", "001", "device $i", type: '', imei: ''));
 
   static Map toMap(Device device) {
     return <String, String>{
@@ -37,7 +37,7 @@ class Device {
       "ownerId": device.ownerId,
       "name": device.name,
       'imei': device.imei,
-      "confirmed":device.confirmed.toString()
+      "confirmed": device.confirmed.toString()
     };
   }
 }

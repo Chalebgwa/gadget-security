@@ -4,7 +4,7 @@ import 'package:gsec/models/user.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
 
 class Header extends StatelessWidget {
-  final User user;
+  final Client user;
   const Header({
     Key key,
     this.user,
@@ -51,7 +51,6 @@ class Header extends StatelessWidget {
               },
             ),
           ),
-         
           Positioned(
             bottom: 1,
             left: 30,

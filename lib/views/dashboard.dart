@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void searchBySSN(String ssn) async {
-    User user = await _auth.searchDeviceById(ssn);
+    Client user = await _auth.searchDeviceById(ssn);
     if (user != null) {
       showOwnerInfo(user);
     } else {
@@ -61,7 +61,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Widget _buildUserAvatar(User user) {
+  Widget _buildUserAvatar(Client user) {
     return CachedNetworkImage(
       key: Key("myImage"),
       imageBuilder: (context, imageProvider) => CircleAvatar(
@@ -77,7 +77,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void showAlertDialogOnOkCallback(User user, Widget child) {
+  void showAlertDialogOnOkCallback(Client user, Widget child) {
     AwesomeDialog(
       context: context,
       body: child,
@@ -92,14 +92,14 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void showDeviceInfo(BuildContext context) {
-    User user = _deviceProvider.owner;
+    Client user = _deviceProvider.owner;
     showAlertDialogOnOkCallback(
       user,
       DeviceInfo(),
     );
   }
 
-  void showOwnerInfo(User user) {
+  void showOwnerInfo(Client user) {
     showAlertDialogOnOkCallback(
         user,
         UserInfo(
@@ -110,7 +110,7 @@ class _DashboardState extends State<Dashboard> {
   void navigateToScanner(BuildContext context) async {
     try {
       barcode = await BarcodeScanner.scan();
-      User user = await _auth.GetUserBySsn(barcode);
+      Client user = await _auth.GetUserBySsn(barcode);
       if (user != null) {
         showOwnerInfo(user);
       } else {

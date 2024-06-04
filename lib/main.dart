@@ -18,7 +18,7 @@ import 'package:gsec/views/profile/profile.dart';
 import 'package:gsec/views/settings.dart';
 import 'package:gsec/views/util/scanner.dart';
 import 'package:positioned_tap_detector/positioned_tap_detector.dart';
-import 'package:provider/provider.dart';
+import "package:provider/provider.dart";
 
 void main() {
   runApp(MyApp());
@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      child: App(), 
+      child: App(),
       providers: [
         ChangeNotifierProvider(
           create: (BuildContext context) => PayService(),

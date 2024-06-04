@@ -175,7 +175,7 @@ class _VisaState extends State<Visa> {
     String _ammount = _ammountCountroler.text;
     String _cardNumber = _cardNumberController.text;
     String _cvv = _cardNumberController.text;
-    String  _mmyy = _mmyyController.text;
+    String _mmyy = _mmyyController.text;
   }
 
   Padding buildTextField(label, controller, isPass, validator, icon) {

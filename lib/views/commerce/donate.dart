@@ -13,15 +13,12 @@ class Donate extends StatefulWidget {
 }
 
 class _DonateState extends State<Donate> {
-
-
   PayService _payService;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _payService = Provider.of<PayService>(context);
   }
-
 
   void navigateToVisa() {
     var route = MaterialPageRoute(builder: (_) => Visa());

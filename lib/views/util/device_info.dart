@@ -16,7 +16,7 @@ class DeviceInfo extends StatefulWidget {
 class _DeviceInfoState extends State<DeviceInfo> {
   DeviceProvider _deviceProvider;
   Auth _auth;
-  User _owner;
+  Client _owner;
   String _ssn;
 
   @override
@@ -31,7 +31,6 @@ class _DeviceInfoState extends State<DeviceInfo> {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(

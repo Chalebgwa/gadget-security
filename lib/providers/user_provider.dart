@@ -3,7 +3,7 @@ import 'package:gsec/models/user.dart';
 import 'package:gsec/providers/base_provider.dart';
 
 class UserProvider extends BaseProvider {
-  Future<User> fetchUser(String field, String value) async {
+  Future<Client> fetchUser(String field, String value) async {
     QuerySnapshot shot = await firestore
         .collection("users")
         .where(
@@ -17,7 +17,7 @@ class UserProvider extends BaseProvider {
     if (docs.length <= 0) {
       return null;
     }
-    
-    return User.fromMap(docs[0].data);
+
+    return Client.fromMap(docs[0].data);
   }
 }

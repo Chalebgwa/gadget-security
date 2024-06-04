@@ -6,5 +6,4 @@ class Message {
   final String timestamp;
 
   Message(this.content, this.type, this.timestamp);
-  
 }

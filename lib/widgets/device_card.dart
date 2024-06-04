@@ -35,8 +35,8 @@ class _DeviceCardState extends State<DeviceCard> {
 
   void getUser() async {
     Navigator.pop(context);
-    var route = MaterialPageRoute<User>(builder: (context) => UserSelector());
-    User peer = await Navigator.push<User>(context, route);
+    var route = MaterialPageRoute<Client>(builder: (context) => UserSelector());
+    Client peer = await Navigator.push<Client>(context, route);
     if (peer != null) {
       var action = await pinConfirm(peer);
       print(action);
@@ -54,7 +54,7 @@ class _DeviceCardState extends State<DeviceCard> {
     }
   }
 
-  Future<Action> showConfirmDialog(String action, {User peer}) async {
+  Future<Action> showConfirmDialog(String action, {Client peer}) async {
     String content = '';
     if (action != 'trade') {
       content = "Are you sure want to delete ${widget.device.name}";
@@ -91,7 +91,7 @@ class _DeviceCardState extends State<DeviceCard> {
         });
   }
 
-  Future<Action> pinConfirm(User peer) async {
+  Future<Action> pinConfirm(Client peer) async {
     String content = '';
 
     return showDialog<Action>(

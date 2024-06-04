@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 
 class DocScanner extends StatefulWidget {
   @override
@@ -21,9 +19,6 @@ class _DocScannerState extends State<DocScanner> {
     //scanDocument();
   }
 
-  
-
- 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

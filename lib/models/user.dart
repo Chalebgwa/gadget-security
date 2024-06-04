@@ -1,4 +1,4 @@
-class User {
+class Client {
   final String name;
   final String surname;
   final String id;
@@ -12,10 +12,10 @@ class User {
   // calculates progress
   int _progress = 0;
 
-  User(this.name, this.id, this.email, this.phone, this.city, this.country,
+  Client(this.name, this.id, this.email, this.phone, this.city, this.country,
       this.gorvenmentId, this.surname, this.imageUrl);
 
-  factory User.fromList(List<String> data) {
+  factory Client.fromList(List<String> data) {
     String _name = data[0];
     String _id = data[1];
     String _email = data[2];
@@ -27,11 +27,11 @@ class User {
     String _image = data[8] ??
         "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6";
 
-    return User(_name, _id, _email, _phone, _city, _country, _gorvenmentId,
+    return Client(_name, _id, _email, _phone, _city, _country, _gorvenmentId,
         _surname, _image);
   }
 
-  factory User.fromMap(Map map) {
+  factory Client.fromMap(Map map) {
     String _name = map["name"];
     String _id = map["id"];
     String _email = map["email"];
@@ -43,13 +43,13 @@ class User {
     String _image = map["imageUrl"] ??
         "https://firebasestorage.googleapis.com/v0/b/gadget-security.appspot.com/o/user.png?alt=media&token=960f70f5-f741-46d3-998f-b33be09cbdf6";
 
-    return User(_name, _id, _email, _phone, _city, _country, _gorvenmentId,
+    return Client(_name, _id, _email, _phone, _city, _country, _gorvenmentId,
         _surname, _image);
   }
 
   get progress => null;
 
-  static toList(User user) {
+  static toList(Client user) {
     return [
       user.name,
       user.id,
@@ -68,6 +68,8 @@ class User {
     return "firstname: $name, lastname: $surname , id: $id";
   }
 
-  static List<User> get users => List.generate(30,
-      (i) => User("name$i", "$i", "user.$i@test.com", "", "", "", "", "", ""));
+  static List<Client> get users => List.generate(
+      30,
+      (i) =>
+          Client("name$i", "$i", "user.$i@test.com", "", "", "", "", "", ""));
 }

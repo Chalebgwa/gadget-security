@@ -6,12 +6,9 @@ class ChatProvider extends ChangeNotifier {
   List<Conversation> _chats = [];
   List<Conversation> get chats => _chats;
 
+  void initChats() {}
 
-  void initChats(){
-    
-  }
-
-  void createChat(User user, User peer) {
+  void createChat(Client user, Client peer) {
     String chatId = peer.id;
     if (_chats.any((e) => e.peer.id == chatId)) {
       return;

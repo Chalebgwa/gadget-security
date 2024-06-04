@@ -3,11 +3,10 @@ import 'package:square_in_app_payments/in_app_payments.dart';
 import 'package:square_in_app_payments/models.dart';
 
 class PayService extends BaseProvider {
-  
-  PayService(){
+  PayService() {
     init();
   }
-  
+
   void init() {
     InAppPayments.setSquareApplicationId(
         'sandbox-sq0idb-O639H-fnac2eN6_j2UmxGA');

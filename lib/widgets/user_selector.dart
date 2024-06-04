@@ -26,7 +26,7 @@ class _UserSelectorState extends State<UserSelector> {
   }
 
   Future<void> onSubmit(String value) async {
-    User user = await _auth.userProvider.fetchUser("gorvenmentId", value);
+    Client user = await _auth.userProvider.fetchUser("gorvenmentId", value);
     if (user != null) {
       //Navigator.pop(context, user);
       bool ok = false;
@@ -115,7 +115,6 @@ class _UserSelectorState extends State<UserSelector> {
               onSubmitted: onSubmit,
               textAlign: TextAlign.center,
               decoration: InputDecoration(
-              
                 border: OutlineInputBorder(),
                 hintText: "Enter User ID",
                 fillColor: Colors.white,
@@ -140,7 +139,7 @@ class UserCard extends StatelessWidget {
   const UserCard({Key key, this.user, this.callback}) : super(key: key);
   final VoidCallback callback;
 
-  final User user;
+  final Client user;
 
   @override
   Widget build(BuildContext context) {

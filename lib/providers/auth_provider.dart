@@ -1,13 +1,11 @@
+
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_sms/flutter_sms.dart';
-import 'package:flutter_sms/flutter_sms.dart';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gsec/models/device.dart';
 
@@ -26,96 +24,86 @@ enum AuthState {
 }
 
 class Auth extends BaseProvider {
-  //Device provider
-  DeviceProvider _deviceProvider = new DeviceProvider();
+  // Device provider
+  final DeviceProvider _deviceProvider = DeviceProvider();
   DeviceProvider get deviceProvider => _deviceProvider;
 
-  //User provider
-  UserProvider _userProvider = new UserProvider();
+  // User provider
+  final UserProvider _userProvider = UserProvider();
 
   // current state of the app
-  AuthState _state; // = AuthState.SIGNED_OU;
+  AuthState _state = AuthState.SIGNED_OUT;
 
-  // logged in user
-  User _currentUser;
-
-  User get currentUser => _currentUser;
+  // logged in Client
+  Client? _currentUser;
+  Client? get currentUser => _currentUser;
 
   // state getter
   AuthState get state => _state;
-
   set state(AuthState state) {
     _state = state;
-
     notifyListeners();
   }
 
   // auto retrieve verification id
-  String verificationId;
-
-  Auth() {
-    //checkLoginStatus();
-  }
+  String? verificationId;
 
   UserProvider get userProvider => _userProvider;
 
-  Future<void> setPersistantLogin(User user) async {
-    var prefs = await SharedPreferences.getInstance();
+  Future<void> setPersistentLogin(Client user) async {
+    final prefs = await SharedPreferences.getInstance();
     prefs.setBool("isLoggedIn", true);
-    List<String> data = User.toList(user);
+    List<String> data = Client.toList(user);
     prefs.setStringList("userData", data);
     notifyListeners();
   }
 
   Future<void> checkLoginStatus() async {
-    var prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     bool status = prefs.getBool("isLoggedIn") ?? false;
-    print(status);
     if (status) {
-      List<String> data = prefs.getStringList("userData");
+      List<String>? data = prefs.getStringList("userData");
       if (data != null) {
-        print(data);
-        _currentUser = User.fromList(data);
+        _currentUser = Client.fromList(data);
         _state = AuthState.SIGNED_IN;
-        notifyListeners();
+      } else {
+        _state = AuthState.SIGNED_OUT;
       }
     } else {
       _state = AuthState.SIGNED_OUT;
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   Future<void> resetPrefs() async {
-    var prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     prefs.setBool("isLoggedIn", false);
   }
 
   Future<bool> signInWithEmail(String email, String password) async {
-    //set the screen to show loading
     _state = AuthState.LOADING;
     notifyListeners();
-    email = email.trim();
-    // lets play
     try {
-      AuthResult result = await firebaseAuth.signInWithEmailAndPassword(
-        email: email,
+      final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.trim(),
         password: password,
       );
 
-      if (result != null) {
-        FirebaseUser user = result.user;
-        DocumentReference reference =
-            firestore.collection("users").document(user.uid);
-        DocumentSnapshot snapshot = await reference.get();
+      if (result.user != null) {
+        final user = result.user!;
+        DocumentReference<Map<String, dynamic>> reference =
+            FirebaseFirestore.instance.collection("users").doc(user.uid);
+        DocumentSnapshot<Map<String, dynamic>> snapshot = await reference.get();
 
-        _currentUser = User.fromMap(snapshot.data);
-        // set persistant login
-        setPersistantLogin(_currentUser);
-        _state = AuthState.SIGNED_IN;
-        notifyListeners();
-        return true;
+        if (snapshot.exists) {
+          _currentUser = Client.fromMap(snapshot.data()!);
+          await setPersistentLogin(_currentUser!);
+          _state = AuthState.SIGNED_IN;
+          notifyListeners();
+          return true;
+        }
       }
-    } on PlatformException {
+    } on FirebaseAuthException {
       _state = AuthState.SIGNED_OUT;
       notifyListeners();
       return false;
@@ -124,13 +112,11 @@ class Auth extends BaseProvider {
       _state = AuthState.SIGNED_OUT;
       notifyListeners();
       return false;
-    } on AuthException {
-      _state = AuthState.SIGNED_OUT;
-      notifyListeners();
-      return false;
     }
 
-    return true;
+    _state = AuthState.SIGNED_OUT;
+    notifyListeners();
+    return false;
   }
 
   Future<String> resetPassword(String email) async {
@@ -138,13 +124,12 @@ class Auth extends BaseProvider {
     try {
       _state = AuthState.LOADING;
       notifyListeners();
-      //trigger loading screen
 
-      firebaseAuth.sendPasswordResetEmail(email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
       message = "Check Your Email";
     } catch (e) {
-      message = "error";
+      message = "Error: ${e.toString()}";
     }
     _state = AuthState.SIGNED_OUT;
     notifyListeners();
@@ -155,41 +140,39 @@ class Auth extends BaseProvider {
     _state = AuthState.LOADING;
     notifyListeners();
     Fluttertoast.showToast(msg: "See you later");
-    await firebaseAuth.signOut().then((b) {
-      _state = AuthState.SIGNED_OUT;
-      notifyListeners();
-      resetPrefs();
-      print("logged out");
-    });
+    await FirebaseAuth.instance.signOut();
+    _state = AuthState.SIGNED_OUT;
+    notifyListeners();
+    await resetPrefs();
   }
 
-  Future<User> searchDeviceById(String identifier) async {
-    //the state to return to after loading
+  Future<Client?> searchDeviceById(String identifier) async {
     AuthState temp = _state;
-    // display looading screen while fetching data
     _state = AuthState.SAFE_LOADING;
     notifyListeners();
-    //print(identifier);
-    DocumentSnapshot shot = await Firestore.instance
+
+    DocumentSnapshot shot = await FirebaseFirestore.instance
         .collection("devices")
-        .document(identifier)
+        .doc(identifier)
         .get();
+
     if (shot.exists) {
       String uid = shot['ownerId'];
-      DocumentSnapshot ushot =
-          await firestore.collection("users").document(uid).get();
+      DocumentSnapshot<Map<String,dynamic>> ushot =
+          await FirebaseFirestore.instance.collection("users").doc(uid).get();
       if (ushot.exists) {
         _state = temp;
         notifyListeners();
-        return User.fromMap(ushot.data);
+        return Client.fromMap(ushot.data()!);
       }
     }
+
     _state = temp;
     notifyListeners();
     return null;
   }
 
-  Future<String> registerUser(
+  Future<String?> registerUser(
     String name,
     String surname,
     String email,
@@ -197,84 +180,63 @@ class Auth extends BaseProvider {
     String phone,
     String gId,
   ) async {
-    //show loading screen
     _state = AuthState.LOADING;
     notifyListeners();
 
     try {
-      // create user here
-      AuthResult authResult = await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential authResult = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      // incase anything goes wrong
-      // todo : find out what could actually go wrong
-      if (authResult != null) {
-        FirebaseUser _user = authResult.user;
+      if (authResult.user != null) {
+        User user = authResult.user!;
         await authenticateViaPhone(phone);
+
         Map<String, String> _userInfo = {
           "name": name,
           "surname": surname,
           "email": email,
           "password": password,
           "phone": phone,
-          "gorvenmentId ": gId,
-          "id": _user.uid
+          "governmentId": gId,
+          "id": user.uid
         };
 
-        await firestore
+        await FirebaseFirestore.instance
             .collection("users")
-            .document(_user.uid)
-            .setData(_userInfo);
+            .doc(user.uid)
+            .set(_userInfo);
 
         _state = AuthState.SIGNED_OUT;
         notifyListeners();
-
-        return _user.uid;
+        return user.uid;
       }
-      _state = AuthState.SIGNED_OUT;
-      notifyListeners();
-      return null;
-    } on PlatformException catch (e) {
+    } on FirebaseAuthException catch (e) {
       print(e.message);
-      _state = AuthState.SIGNED_OUT;
-      notifyListeners();
-      return null;
     }
+
+    _state = AuthState.SIGNED_OUT;
+    notifyListeners();
+    return null;
   }
 
   Future<void> authenticateViaPhone(String phone) async {
-    print(phone);
-    // auto retrieve verification code
-    final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verID) {
-      this.verificationId = verID;
-    };
-
-    final PhoneCodeSent codeSent = (String verID, [int forceCodeResend]) {
-      this.verificationId = verID;
-      print(verID);
-      Fluttertoast.showToast(msg: "Phone verification code sent");
-    };
-
-    final PhoneVerificationCompleted verificationCompleted =
-        (AuthCredential credential) {
-      print(credential);
-      Fluttertoast.showToast(msg: "Phone verification Completed");
-    };
-
-    final PhoneVerificationFailed verificationFailed =
-        (AuthException exception) {
-      Fluttertoast.showToast(msg: "Phone verification Failed");
-    };
-
-    await firebaseAuth.verifyPhoneNumber(
-      codeAutoRetrievalTimeout: autoRetrieve,
+    await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phone,
-      codeSent: codeSent,
-      timeout: const Duration(microseconds: 0),
-      verificationCompleted: verificationCompleted,
-      verificationFailed: verificationFailed,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await FirebaseAuth.instance.signInWithCredential(credential);
+        Fluttertoast.showToast(msg: "Phone verification Completed");
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        Fluttertoast.showToast(msg: "Phone verification Failed: ${e.message}");
+      },
+      codeSent: (String verID, int? forceCodeResend) {
+        verificationId = verID;
+        Fluttertoast.showToast(msg: "Phone verification code sent");
+      },
+      codeAutoRetrievalTimeout: (String verID) {
+        verificationId = verID;
+      },
     );
   }
 
@@ -282,37 +244,34 @@ class Auth extends BaseProvider {
     _state = AuthState.LOADING;
     notifyListeners();
 
-    StorageReference storageRef =
-        FirebaseStorage.instance.ref().child(link + currentUser.id);
+    final storageRef = FirebaseStorage.instance.ref().child('$link${currentUser!.id}');
+    final uploadTask = storageRef.putFile(file);
 
-    StorageUploadTask uploadTask = storageRef.putFile(file);
-
-    await uploadTask.onComplete;
-
-    String url = await storageRef.getDownloadURL();
+    final taskSnapshot = await uploadTask;
+    final url = await taskSnapshot.ref.getDownloadURL();
 
     _state = AuthState.SIGNED_IN;
     notifyListeners();
-
     return url;
   }
 
-  Future<void> updateUser(
-      {name,
-      city,
-      email,
-      idNumber,
-      phone,
-      userId,
-      middlename,
-      surname,
-      country,
-      imageUrl}) async {
-    var data = {
+  Future<void> updateUser({
+    required String name,
+    required String city,
+    required String email,
+    required String idNumber,
+    required String phone,
+    required String userId,
+    required String middlename,
+    required String surname,
+    required String country,
+    required String imageUrl,
+  }) async {
+    final data = {
       "email": email,
       "city": city,
       "name": name,
-      "gorvenmentId": idNumber,
+      "governmentId": idNumber,
       "phone": phone,
       "surname": surname,
       "middlename": middlename,
@@ -323,50 +282,39 @@ class Auth extends BaseProvider {
     _state = AuthState.LOADING;
     notifyListeners();
 
-    await firestore
-        .collection("users")
-        .document(_currentUser.id)
-        .updateData(data);
-    Fluttertoast.showToast(msg: "user details changed");
-    _state = AuthState.SIGNED_IN;
+    await FirebaseFirestore.instance.collection("users").doc(currentUser!.id).update(data);
+    Fluttertoast.showToast(msg: "User details changed");
 
-    DocumentSnapshot shot =
-        await firestore.collection("users").document(_currentUser.id).get();
-    _currentUser = User.fromMap(shot.data);
-
-    notifyListeners();
-  }
-
-  Future<void> uploadFile(File file, {filename}) async {
-    //set loading screen
-    _state = AuthState.LOADING;
-    notifyListeners();
-
-    if (filename == null) {
-      filename = _currentUser.id;
-    }
-
-    StorageReference reference = FirebaseStorage.instance.ref().child(filename);
-    StorageUploadTask uploadTask = reference.putFile(file);
-    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    String url = await storageTaskSnapshot.ref.getDownloadURL();
-    print(url);
-
-    Map<String, String> data = {"imageUrl": url};
-    await firestore
-        .collection("users")
-        .document(_currentUser.id)
-        .updateData(data);
+    final shot = await FirebaseFirestore.instance.collection("users").doc(currentUser!.id).get();
+    _currentUser = Client.fromMap(shot.data()!);
 
     _state = AuthState.SIGNED_IN;
     notifyListeners();
   }
 
-  Future<void> addDevice(Device device, file) async {
+  Future<void> uploadFile(File file, {String? filename}) async {
     _state = AuthState.LOADING;
     notifyListeners();
 
-    String url = await uploadDocument(file, "/${device.identifier}/");
+    filename ??= currentUser!.id;
+    final storageRef = FirebaseStorage.instance.ref().child(filename);
+    final uploadTask = storageRef.putFile(file);
+
+    final taskSnapshot = await uploadTask;
+    final url = await taskSnapshot.ref.getDownloadURL();
+
+    final data = {"imageUrl": url};
+    await FirebaseFirestore.instance.collection("users").doc(currentUser!.id).update(data);
+
+    _state = AuthState.SIGNED_IN;
+    notifyListeners();
+  }
+
+  Future<void> addDevice(Device device, File file) async {
+    _state = AuthState.LOADING;
+    notifyListeners();
+
+    final url = await uploadDocument(file, "/${device.identifier}/");
 
     await _deviceProvider.addDevice(device, url: url);
 
@@ -374,7 +322,7 @@ class Auth extends BaseProvider {
     notifyListeners();
   }
 
-  Future<void> transfer(User to, Device device) async {
+  Future<void> transfer(Client to, Device device) async {
     _state = AuthState.LOADING;
     notifyListeners();
 
@@ -384,31 +332,31 @@ class Auth extends BaseProvider {
     notifyListeners();
   }
 
-  Future<User> GetUserBySsn(String barcode) async {
+  Future<Client> GetUserBySsn(String barcode) async {
     AuthState _tempState = _state;
     _state = AuthState.SAFE_LOADING;
     notifyListeners();
 
-    DocumentSnapshot shot =
-        await firestore.collection("primary").document(barcode).get();
+    DocumentSnapshot<Map<String,dynamic>> shot =
+        await firestore.collection("primary").doc(barcode).get();
 
-    String uid = shot.data['uid'];
+    String uid = shot.data()!["uid"];
 
-    DocumentSnapshot ushot =
-        await firestore.collection('users').document(uid).get();
+    DocumentSnapshot<Map<String,dynamic>> ushot =
+        await firestore.collection('users').doc(uid).get();
 
     _state = _tempState;
     notifyListeners();
 
-    return User.fromMap(ushot.data);
+    return Client.fromMap(ushot.data()!);
   }
 
   Future<Action> confirmWithPin(String pin) async {
     var doc = await firestore
         .collection("security_info")
-        .document("${_currentUser.id}")
+        .doc("${currentUser!.id}")
         .get();
-    var data = doc.data;
+    var data = doc.data()!;
     if (pin == data["safe"]) {
       return Action.OK;
     } else if (pin == data["alert"]) {
@@ -424,5 +372,12 @@ class Auth extends BaseProvider {
           peer.toString(),
       recipients: ["+26777147912"],
     );
+  }
+  
+  @override
+  void initializePreferences()  {
+    SharedPreferences.getInstance().then((prefs) {
+      preferences = prefs;
+    });
   }
 }

@@ -61,11 +61,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
   }
 
   getImage() async {
-    var file; //= await ImagePicker.pickImage(source: ImageSource.gallery);
-    if (file != null) {
-      image = file.uri.path;
-      handleSubmit(ChatType.IMAGE, image);
-    }
+    var file;
   }
 
   @override
@@ -89,7 +85,7 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
           Container(
             color: Colors.white.withOpacity(0.6),
             child: IconTheme(
-                          child: Row(
+              child: Row(
                 children: <Widget>[
                   IconButton(
                     icon: Icon(FontAwesomeIcons.image),
@@ -138,7 +134,8 @@ class _ChatViewState extends State<ChatView> with TickerProviderStateMixin {
                     },
                   )
                 ],
-              ), data: IconThemeData(color: Colors.white),
+              ),
+              data: IconThemeData(color: Colors.white),
             ),
           ),
           isGifBlockOpen ? buildGifBock() : Container()

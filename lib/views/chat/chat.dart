@@ -18,14 +18,10 @@ class _InboxState extends State<Inbox> {
 
   Tween<Offset> tween = new Tween<Offset>();
 
-  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
   }
-
-  
 
   showUsers() {
     showCupertinoModalPopup(
@@ -35,14 +31,11 @@ class _InboxState extends State<Inbox> {
               itemCount: 10,
               physics: BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
-                User user = User.users[index];
+                Client user = Client.users[index];
                 return Card(
                   child: ListTile(
                     title: Text(user.name),
-                    onTap: () {
-
-                      
-                    },
+                    onTap: () {},
                   ),
                 );
               },

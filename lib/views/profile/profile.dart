@@ -24,7 +24,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   static Random random = Random();
   Auth _auth;
-  User _currentUser;
+  Client _currentUser;
 
   @override
   void didChangeDependencies() {
@@ -57,7 +57,10 @@ class _ProfileState extends State<Profile> {
                 Header(user: _auth.currentUser),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("${_currentUser.name}",style: TextStyle(fontSize: 20),),
+                  child: Text(
+                    "${_currentUser.name}",
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ),
                 Text("${_currentUser.surname}"),
                 Row(

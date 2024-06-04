@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class PayOption extends StatelessWidget {
-  const PayOption({Key key, this.label, this.onPressed, this.leading, this.color})
+  const PayOption(
+      {Key key, this.label, this.onPressed, this.leading, this.color})
       : super(key: key);
   final String label;
   final VoidCallback onPressed;

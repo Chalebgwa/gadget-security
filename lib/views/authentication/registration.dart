@@ -81,7 +81,7 @@ class _RegistrationState extends State<Registration> {
       );
 
       // register device here
-      if (_saveDevice && uid != null) {
+      if (_saveDevice) {
         bool result = await _deviceProvider.savePrimaryDevice(uid);
         if (!result) {
           Fluttertoast.showToast(msg: "Device already exists");
@@ -306,7 +306,7 @@ class _RegistrationState extends State<Registration> {
     );
   }
 
-  Padding buildTextField(label, controller, validator, hint, {isPhone: true}) {
+  Padding buildTextField(label, controller, validator, hint, {isPhone = true}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(

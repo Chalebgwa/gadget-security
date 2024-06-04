@@ -32,11 +32,7 @@ class _RootState extends State<Root> {
   Widget build(BuildContext context) {
     var screen;
 
-    
-
-    setState(() {
-      
-    });
+    setState(() {});
 
     switch (_auth.state) {
       case AuthState.SIGNED_OUT:
