@@ -28,7 +28,7 @@ dependencies:
   liquid_progress_indicator: #^0.3.2
   awesome_dialog: #^0.1.0
   square_in_app_payments: 
-  hidden_drawer_menu: #^1.1.2
+  hidden_drawer_menu: ^3.0.1 #^1.1.2
   bouncing_widget: #^1.2.0
   cached_network_image: #^2.0.0-rc
   # admob_flutter: #^0.3.4

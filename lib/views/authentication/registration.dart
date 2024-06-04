@@ -6,7 +6,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/util/validator.dart';
-import 'package:hidden_drawer_menu/simple_hidden_drawer/bloc/simple_hidden_drawer_bloc.dart';
 import 'package:provider/provider.dart';
 
 class Registration extends StatefulWidget {
@@ -14,7 +13,7 @@ class Registration extends StatefulWidget {
   final VoidCallback onBlueClick;
 
   Registration(
-      {Key key, this.auth, this.onBlueClick, SimpleHiddenDrawerBloc controller})
+      {Key? key, required this.auth, required this.onBlueClick, controller})
       : super(key: key);
 
   @override
@@ -24,11 +23,11 @@ class Registration extends StatefulWidget {
 class _RegistrationState extends State<Registration> {
   bool _saveDevice = true;
 
-  Auth _auth;
-  DeviceProvider _deviceProvider;
-  String _deviceName;
-  String _deviceId;
-  String _countryCode = "+267";
+  late Auth _auth;
+  DeviceProvider? _deviceProvider;
+  String? _deviceName;
+  String? _deviceId;
+  String? _countryCode = "+267";
 
   GlobalKey<FormState> _registrationFormKey = GlobalKey<FormState>();
 
@@ -55,23 +54,23 @@ class _RegistrationState extends State<Registration> {
     super.didChangeDependencies();
     _auth = Provider.of<Auth>(context);
     _deviceProvider = Provider.of<DeviceProvider>(context);
-    _deviceName = _deviceProvider.details['model'];
-    _deviceId = _deviceProvider.details['identifier'];
+    _deviceName = _deviceProvider?.details['model'];
+    _deviceId = _deviceProvider?.details['identifier'];
   }
 
   Future<void> save() async {
-    if (_registrationFormKey.currentState.validate()) {
+    if (_registrationFormKey.currentState!.validate()) {
       String _name = _nameController.text;
       String _surname = _surnameController.text;
       String _email = _emailController.text;
       String _gorvId = _gorvenmentIdController.text;
       String _password = _passwordController.text;
-      String _phone = _countryCode + _phoneController.text;
+      String _phone = _countryCode! + _phoneController.text;
 
       // register user before u register device
       // it would be safer to check if a user's device can register
       // but that has more problems than this approach
-      String uid = await _auth.registerUser(
+      String? uid = await _auth.registerUser(
         _name,
         _surname,
         _email,
@@ -82,7 +81,7 @@ class _RegistrationState extends State<Registration> {
 
       // register device here
       if (_saveDevice) {
-        bool result = await _deviceProvider.savePrimaryDevice(uid);
+        bool result = await _deviceProvider!.savePrimaryDevice(uid!);
         if (!result) {
           Fluttertoast.showToast(msg: "Device already exists");
         }
@@ -260,7 +259,7 @@ class _RegistrationState extends State<Registration> {
             child: Text(
               _deviceName ?? "Device Name",
               style: TextStyle(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -280,9 +279,9 @@ class _RegistrationState extends State<Registration> {
             activeColor: Theme.of(context).primaryColor,
             selected: true,
             value: _saveDevice,
-            onChanged: (bool value) {
+            onChanged: (bool? value) {
               setState(() {
-                _saveDevice = value;
+                _saveDevice = value ?? false;
               });
             },
           ),
@@ -294,13 +293,18 @@ class _RegistrationState extends State<Registration> {
   Container buildRegisterButton() {
     return Container(
       margin: EdgeInsets.all(20),
-      child: RaisedButton(
-        color: Theme.of(context).primaryColor,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
         child: Container(
           width: double.infinity,
           child: Center(child: Text("Sign up")),
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+       
         onPressed: save,
       ),
     );
@@ -313,19 +317,19 @@ class _RegistrationState extends State<Registration> {
         validator: validator,
         controller: controller,
         style: TextStyle(
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).secondaryHeaderColor,
         ),
         decoration: InputDecoration(
           labelStyle:
-              TextStyle(color: Theme.of(context).accentColor.withOpacity(.6)),
+              TextStyle(color: Theme.of(context).colorScheme.onPrimary.withOpacity(.6)),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
           hintText: hint,
           hintStyle:
-              TextStyle(color: Theme.of(context).accentColor, fontSize: 10.0),
+              TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 10.0),
           labelText: label,
         ),
       ),

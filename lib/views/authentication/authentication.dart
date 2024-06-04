@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gsec/page.dart';
+import 'package:gsec/page.dart' as p;
+import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/views/authentication/registration.dart';
 import 'package:gsec/views/authentication/sign_in.dart';
-import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
+import 'package:hidden_drawer_menu/hidden_drawer_menu.dart';
+import 'package:provider/provider.dart';
 
 class Athentication extends StatefulWidget {
-  final SimpleHiddenDrawerBloc bloc;
+  final HiddenDrawerMenu bloc;
 
-  Athentication({Key key, this.bloc}) : super(key: key);
+  Athentication({Key? key, required this.bloc}) : super(key: key);
 
   @override
   _AthenticationState createState() => _AthenticationState();
@@ -50,7 +52,7 @@ class _AthenticationState extends State<Athentication> {
 
   @override
   Widget build(BuildContext context) {
-    return Page(
+    return p.Page(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -62,7 +64,7 @@ class _AthenticationState extends State<Athentication> {
           ),
           centerTitle: true,
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(
                 actionText,
                 style: TextStyle(fontSize: 10, color: Colors.purple),
@@ -82,6 +84,7 @@ class _AthenticationState extends State<Athentication> {
               controller: widget.bloc,
             ),
             Registration(
+              auth: context.read<Auth>(),
               onBlueClick: loginPage,
               controller: widget.bloc,
             )

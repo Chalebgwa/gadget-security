@@ -25,11 +25,11 @@ class UserSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return null;
+    return Container();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return null;
+    return Container();
   }
 }

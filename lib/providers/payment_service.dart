@@ -1,4 +1,5 @@
 import 'package:gsec/providers/base_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:square_in_app_payments/in_app_payments.dart';
 import 'package:square_in_app_payments/models.dart';
 
@@ -28,4 +29,11 @@ class PayService extends BaseProvider {
   void _onCardEntryCancel() {}
 
   void _cardEntryComplete() {}
+  
+  @override
+  void initializePreferences() {
+    SharedPreferences.getInstance().then((prefs) {
+      preferences = prefs;
+    });
+  }
 }

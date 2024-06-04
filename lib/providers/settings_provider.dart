@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:gsec/providers/base_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsProvider with ChangeNotifier {
-  SharedPreferences prefs;
+class SettingsProvider extends BaseProvider {
+  
   bool _isLeftHanded = false;
   bool _isDarkTheme = false;
 
@@ -11,17 +12,17 @@ class SettingsProvider with ChangeNotifier {
 
   void isLefHanded(value) async {
     _isLeftHanded = value;
-    prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isLeftHanded', value);
-    prefs.commit();
+    preferences = await SharedPreferences.getInstance();
+    preferences.setBool('isLeftHanded', value);
+    preferences.commit();
     notifyListeners();
   }
 
   void isDarkThemed(value) async {
     _isDarkTheme = value;
-    prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDarkThemed', value);
-    prefs.commit();
+  
+    preferences.setBool('isDarkThemed', value);
+   
     notifyListeners();
   }
 
@@ -31,9 +32,16 @@ class SettingsProvider with ChangeNotifier {
 
   //initialise all user settings
   void _initSettings() async {
-    prefs = await SharedPreferences.getInstance();
-    _isLeftHanded = prefs.getBool("isLeftHanded") ?? false;
-    _isDarkTheme = prefs.getBool('isDarkThemed') ?? false;
+    
+    _isLeftHanded = preferences.getBool("isLeftHanded") ?? false;
+    _isDarkTheme = preferences.getBool('isDarkThemed') ?? false;
     notifyListeners();
+  }
+  
+  @override
+  void initializePreferences() {
+    SharedPreferences.getInstance().then((prefs) {
+      preferences = prefs;
+    });
   }
 }

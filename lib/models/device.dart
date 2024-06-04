@@ -31,7 +31,7 @@ class Device {
   static List<Device> get devices => List<Device>.generate(
       5, (i) => Device("$i", "001", "device $i", type: '', imei: ''));
 
-  static Map toMap(Device device) {
+  static Map<String,dynamic> toMap(Device device) {
     return <String, String>{
       "identifier": device.identifier,
       "ownerId": device.ownerId,

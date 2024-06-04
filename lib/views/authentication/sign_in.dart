@@ -7,15 +7,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/providers/auth_provider.dart';
 import 'package:gsec/util/validator.dart';
 import 'package:gsec/views/dashboard.dart';
-import 'package:hidden_drawer_menu/hidden_drawer/hidden_drawer_menu.dart';
-import 'package:hidden_drawer_menu/simple_hidden_drawer/bloc/simple_hidden_drawer_bloc.dart';
+
 import 'package:provider/provider.dart';
 
 class SignIn extends StatefulWidget {
   final VoidCallback onBlueClick;
-  final SimpleHiddenDrawerBloc controller;
+  final  controller;
 
-  SignIn({Key key, this.onBlueClick, this.controller}) : super(key: key);
+  SignIn({Key? key, required this.onBlueClick, this.controller}) : super(key: key);
 
   @override
   _SignInState createState() => _SignInState();
@@ -25,9 +24,9 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _emailController = new TextEditingController();
   final TextEditingController _resetController = new TextEditingController();
   final TextEditingController _passwordController = new TextEditingController();
-  Auth _auth;
+  late Auth _auth;
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  SimpleHiddenDrawerBloc controller;
+  dynamic controller;
 
   @override
   void initState() {
@@ -62,7 +61,7 @@ class _SignInState extends State<SignIn> {
                       Theme.of(context).primaryColor.withOpacity(.4),
                   child: Image.asset(
                     "assets/splash.png",
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ),
@@ -90,8 +89,8 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  FlatButton buildForgotpassword(Auth auth) {
-    return FlatButton(
+  TextButton buildForgotpassword(Auth auth) {
+    return TextButton(
       child: Text(
         "forgot password",
         style: TextStyle(
@@ -115,7 +114,7 @@ class _SignInState extends State<SignIn> {
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
                       style: TextStyle(
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                       controller: _resetController,
                       decoration: InputDecoration(
@@ -126,9 +125,8 @@ class _SignInState extends State<SignIn> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      elevation: 50,
-                      color: Theme.of(context).primaryColor,
+                    child: ElevatedButton(
+                       
                       child: Text("reset password"),
                       onPressed: reset,
                     ),
@@ -143,16 +141,16 @@ class _SignInState extends State<SignIn> {
   Container buildLoginButton(Auth _auth) {
     return Container(
       margin: EdgeInsets.all(20),
-      child: RaisedButton(
-        color: Theme.of(context).primaryColor,
+      child: ElevatedButton(
+       // : Theme.of(context).primaryColor,
         child: Container(
           width: double.infinity,
           child: Container(
               width: 25, height: 25, child: Center(child: Text("Sign In"))),
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-        ),
+        // shape: RoundedRectangleBorder(
+        //   borderRadius: BorderRadius.circular(30),
+        // ),
         onPressed: login,
       ),
     );
