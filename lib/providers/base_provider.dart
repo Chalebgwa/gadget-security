@@ -6,8 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class BaseProvider with ChangeNotifier {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  Firestore firestore = Firestore.instance;
-  SharedPreferences preferences;
-  FirebaseStorage firebaseStorage = FirebaseStorage();
-  
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  SharedPreferences? preferences;
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
 }

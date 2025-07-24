@@ -5,21 +5,21 @@ class LoadingScreen extends StatefulWidget {
   final double radius;
   final double dotRadius;
 
-  LoadingScreen({this.radius = 30.0, this.dotRadius = 3.0});
+  const LoadingScreen({super.key, this.radius = 30.0, this.dotRadius = 3.0});
 
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
 class _LoadingScreenState extends State<LoadingScreen>
     with SingleTickerProviderStateMixin {
-  Animation<double> animationRotation;
-  Animation<double> animationRadiusIn;
-  Animation<double> animationRadiusOut;
-  AnimationController controller;
+  late Animation<double> animationRotation;
+  late Animation<double> animationRadiusIn;
+  late Animation<double> animationRadiusOut;
+  late AnimationController controller;
 
-  double radius;
-  double dotRadius;
+  double radius = 0;
+  double dotRadius = 0;
 
   @override
   void initState() {
@@ -38,7 +38,7 @@ class _LoadingScreenState extends State<LoadingScreen>
     animationRotation = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(
+        curve: const Interval(
           0.0,
           1.0,
           curve: Curves.linear,
@@ -49,28 +49,25 @@ class _LoadingScreenState extends State<LoadingScreen>
     animationRadiusIn = Tween(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(0.75, 1.0, curve: Curves.elasticIn),
+        curve: const Interval(0.75, 1.0, curve: Curves.elasticIn),
       ),
     );
 
     animationRadiusOut = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Interval(0.0, 0.25, curve: Curves.elasticOut),
+        curve: const Interval(0.0, 0.25, curve: Curves.elasticOut),
       ),
     );
 
     controller.addListener(() {
       setState(() {
-        if (controller.value >= 0.75 && controller.value <= 1.0)
+        if (controller.value >= 0.75 && controller.value <= 1.0) {
           radius = widget.radius * animationRadiusIn.value;
-        else if (controller.value >= 0.0 && controller.value <= 0.25)
+        } else if (controller.value >= 0.0 && controller.value <= 0.25) {
           radius = widget.radius * animationRadiusOut.value;
+        }
       });
-    });
-
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {}
     });
 
     controller.repeat();
@@ -78,109 +75,102 @@ class _LoadingScreenState extends State<LoadingScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100.0,
-      height: 100.0,
-      color: Theme.of(context).primaryColor,
-      child: new Center(
-        child: new RotationTransition(
-          turns: animationRotation,
-          child: new Container(
-            //color: Colors.limeAccent,
-            child: new Center(
-              child: Stack(
-                children: <Widget>[
-                  new Transform.translate(
-                    offset: Offset(0.0, 0.0),
-                    child: Dot(
-                      radius: radius,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.amber,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0),
-                      radius * sin(0.0),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.deepOrangeAccent,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 1 * pi / 4),
-                      radius * sin(0.0 + 1 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.pinkAccent,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 2 * pi / 4),
-                      radius * sin(0.0 + 2 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.purple,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 3 * pi / 4),
-                      radius * sin(0.0 + 3 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.yellow,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 4 * pi / 4),
-                      radius * sin(0.0 + 4 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.lightGreen,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 5 * pi / 4),
-                      radius * sin(0.0 + 5 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.orangeAccent,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 6 * pi / 4),
-                      radius * sin(0.0 + 6 * pi / 4),
-                    ),
-                  ),
-                  new Transform.translate(
-                    child: Dot(
-                      radius: dotRadius,
-                      color: Colors.blueAccent,
-                    ),
-                    offset: Offset(
-                      radius * cos(0.0 + 7 * pi / 4),
-                      radius * sin(0.0 + 7 * pi / 4),
-                    ),
+    return Scaffold(
+      backgroundColor: Colors.purple.shade50,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // App logo or icon
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.purple.shade100,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.purple.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
+              child: Icon(
+                Icons.security,
+                size: 50,
+                color: Colors.purple.shade600,
+              ),
             ),
-          ),
+            const SizedBox(height: 30),
+            
+            // App name
+            Text(
+              'Gadget Security',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple.shade700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            // Tagline
+            Text(
+              'Protecting your digital life',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.purple.shade400,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+            const SizedBox(height: 40),
+            
+            // Custom loading animation
+            SizedBox(
+              width: 100.0,
+              height: 100.0,
+              child: Center(
+                child: RotationTransition(
+                  turns: animationRotation,
+                  child: Center(
+                    child: Stack(
+                      children: <Widget>[
+                        Transform.translate(
+                          offset: const Offset(0.0, 0.0),
+                          child: Dot(
+                            radius: radius,
+                            color: Colors.transparent,
+                          ),
+                        ),
+                        for (int i = 0; i < 8; i++)
+                          Transform.translate(
+                            offset: Offset(
+                              radius * cos(i * pi / 4),
+                              radius * sin(i * pi / 4),
+                            ),
+                            child: Dot(
+                              radius: dotRadius,
+                              color: Colors.purple.shade300,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            
+            // Loading text
+            Text(
+              'Loading...',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.purple.shade300,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -197,11 +187,11 @@ class Dot extends StatelessWidget {
   final double radius;
   final Color color;
 
-  Dot({this.radius, this.color});
+  const Dot({super.key, required this.radius, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return new Center(
+    return Center(
       child: Container(
         width: radius,
         height: radius,

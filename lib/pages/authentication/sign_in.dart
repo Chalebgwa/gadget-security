@@ -3,24 +3,29 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gsec/pages/authentication/registration.dart';
 import 'package:gsec/pages/page.dart';
 import 'package:gsec/widgets/nm_box.dart';
+import 'package:gsec/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class SignIn extends StatelessWidget {
-  SignIn({Key key}) : super(key: key);
+  SignIn({super.key});
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    TextStyle defaultStyle = TextStyle(
-        fontSize: 40, color: Colors.white, fontWeight: FontWeight.w100);
+    const TextStyle defaultStyle = TextStyle(
+      fontSize: 40, 
+      color: Colors.white, 
+      fontWeight: FontWeight.w100,
+    );
 
     return Scaffold(
       body: Stack(
         children: <Widget>[
           Container(
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/back.jpg"),
                 fit: BoxFit.fill,
@@ -32,20 +37,23 @@ class SignIn extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [Colors.black.withOpacity(.5), Colors.black.withOpacity(.8)],
+                colors: [
+                  Colors.black.withOpacity(.5), 
+                  Colors.black.withOpacity(.8),
+                ],
               ),
             ),
             child: Padding(
               padding: const EdgeInsets.only(left: 50, right: 50),
               child: ListView(
-                //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
                 children: <Widget>[
                   Row(
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () {},
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       )
                     ],
                   ),
@@ -59,7 +67,6 @@ class SignIn extends StatelessWidget {
                           style: defaultStyle.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 40,
-                            // decoration: TextDecoration.lineThrough,
                           ),
                         ),
                         TextSpan(
@@ -72,20 +79,20 @@ class SignIn extends StatelessWidget {
                       style: defaultStyle,
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
                   Column(
                     children: <Widget>[
                       Container(
                         height: 70,
                         width: MediaQuery.of(context).size.width,
                         child: TextField(
-                          style: TextStyle(
+                          controller: _emailController,
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(FontAwesomeIcons.userAlt),
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: const InputDecoration(
+                            suffixIcon: Icon(FontAwesomeIcons.userAlt, color: Colors.white70),
                             border: InputBorder.none,
                             fillColor: Colors.lightBlueAccent,
                             labelText: 'Email',
@@ -99,12 +106,13 @@ class SignIn extends StatelessWidget {
                         height: 70,
                         width: MediaQuery.of(context).size.width,
                         child: TextField(
-                          style: TextStyle(
+                          controller: _passController,
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
                           obscureText: true,
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(FontAwesomeIcons.lock),
+                          decoration: const InputDecoration(
+                            suffixIcon: Icon(FontAwesomeIcons.lock, color: Colors.white70),
                             border: InputBorder.none,
                             fillColor: Colors.lightBlueAccent,
                             labelText: 'Password',
@@ -116,10 +124,16 @@ class SignIn extends StatelessWidget {
                       ),
                     ],
                   ),
-                  _buildLoginButton(context),
-                  FlatButton(
-                    onPressed: () {},
-                    child: Text(
+                  Consumer<Auth>(
+                    builder: (context, auth, child) {
+                      return _buildLoginButton(context, auth);
+                    },
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      _showForgotPasswordDialog(context);
+                    },
+                    child: const Text(
                       "Forgot your password?",
                       style: TextStyle(
                         color: Colors.white,
@@ -127,20 +141,18 @@ class SignIn extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         "Your first time here?",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w100,
                         ),
                       ),
-                      FlatButton(
+                      TextButton(
                         onPressed: () {
                           var route = animateRoute(
                             context: context,
@@ -148,7 +160,7 @@ class SignIn extends StatelessWidget {
                           );
                           Navigator.push(context, route);
                         },
-                        child: Text(
+                        child: const Text(
                           "Join Us",
                           style: TextStyle(
                             color: Colors.white,
@@ -167,32 +179,145 @@ class SignIn extends StatelessWidget {
     );
   }
 
-  Container _buildLoginButton(BuildContext context) {
+  Widget _buildLoginButton(BuildContext context, Auth auth) {
+    final bool isLoading = auth.state == AuthState.loading;
+    
     return Container(
       alignment: Alignment.center,
       height: 50,
       width: MediaQuery.of(context).size.width,
-      decoration: nMbox.copyWith(boxShadow: [
-        
-      ]),
-      child: FlatButton(
-        onPressed: () {},
-        child: Text(
-          'Sign In',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.purpleAccent,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+      decoration: nMbox.copyWith(boxShadow: const []),
+      child: ElevatedButton(
+        onPressed: isLoading ? null : () => _handleLogin(context, auth),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.purpleAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
+        child: isLoading 
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Text(
+              'Sign In',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.purpleAccent,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+      ),
+    );
+  }
+
+  Future<void> _handleLogin(BuildContext context, Auth auth) async {
+    final email = _emailController.text.trim();
+    final password = _passController.text.trim();
+    
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!_isValidEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid email address'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    final success = await auth.signInWithEmail(email, password);
+    
+    if (success) {
+      // Navigate to main app or dashboard
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    }
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final TextEditingController emailController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your email address to receive a password reset link.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          Consumer<Auth>(
+            builder: (context, auth, child) {
+              return ElevatedButton(
+                onPressed: auth.state == AuthState.loading 
+                  ? null 
+                  : () async {
+                      final email = emailController.text.trim();
+                      if (email.isNotEmpty && _isValidEmail(email)) {
+                        final result = await auth.resetPassword(email);
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result)),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please enter a valid email address'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                child: auth.state == AuthState.loading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Send Reset Link'),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
   Container _buildTextField(hint, controller, icon) {
     return Container(
-      margin: EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
       decoration: nMbox.copyWith(color: Colors.white),
       child: TextField(
         controller: controller,
@@ -202,7 +327,7 @@ class SignIn extends StatelessWidget {
             child: Icon(icon),
           ),
           alignLabelWithHint: true,
-          border: OutlineInputBorder(borderSide: BorderSide.none),
+          border: const OutlineInputBorder(borderSide: BorderSide.none),
           hintText: hint,
         ),
       ),

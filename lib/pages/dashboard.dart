@@ -4,87 +4,126 @@ import 'package:gsec/pages/authentication/sign_in.dart';
 import 'package:gsec/pages/device_info.dart';
 import 'package:gsec/pages/page.dart';
 import 'package:gsec/pages/settings.dart';
+import 'package:gsec/pages/forms/device_registration.dart';
 import 'package:gsec/widgets/dashcard.dart';
 import 'package:gsec/widgets/fancy_drawer.dart';
 import 'package:gsec/widgets/nm_box.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:gsec/providers/auth_provider.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
 
 class Dashboard extends StatelessWidget {
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  Dashboard({Key key}) : super(key: key);
-  void turnPage(int page) {}
+  Dashboard({super.key});
+  void turnPage(int page) {
+    switch (page) {
+      case 2:
+        // TODO: Navigate to trading/selling page
+        break;
+      case 3:
+        // Navigate to device registration
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const DeviceRegistrationPage(),
+          ),
+        );
+        break;
+    }
+  }
 
   void scan(BuildContext context) async {
-    String value = await scanner.scan();
-    var snackbar = SnackBar(content: Text(value ?? "Error"));
-    Scaffold.of(context).showSnackBar(snackbar);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => _QRScannerPage(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var _topColor = Colors.grey.shade200;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        endDrawer: FancyDrawer(),
-        backgroundColor: _topColor,
-        body: Stack(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage("assets/back.jpg"), fit: BoxFit.fill)),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(.7),
-              ),
-              child: CustomScrollView(
-                slivers: <Widget>[
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          //FlatButton(onPressed: (){}, child: Text("Premium",style: TextStyle(color: Colors.yellow),),),
-                          Expanded(child: Container()),
-                          TopButton(
-                            icon: FontAwesomeIcons.lock,
-                            label: "Sign In",
-                            onTap: () {
-                              var route = animateRoute(
-                                context: context,
-                                page: SignIn(),
-                              );
-                              Navigator.push(context, route);
-                            },
-                          ),
-                          TopButton(
-                            icon: FontAwesomeIcons.bars,
-                            label: "Menu",
-                            onTap: () {
-                              _scaffoldKey.currentState.openEndDrawer();
-                            },
-                          ),
-                        ],
-                      ),
+    return Consumer<Auth>(
+      builder: (context, auth, child) {
+        return SafeArea(
+          child: Scaffold(
+            key: _scaffoldKey,
+            endDrawer: const FancyDrawer(),
+            backgroundColor: _topColor,
+            body: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/back.jpg"), 
+                      fit: BoxFit.fill,
                     ),
                   ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(.7),
+                  ),
+                  child: CustomScrollView(
+                    slivers: <Widget>[
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              const Expanded(child: SizedBox()),
+                              if (auth.currentUser == null) ...[
+                                TopButton(
+                                  icon: FontAwesomeIcons.lock,
+                                  label: "Sign In",
+                                  onTap: () {
+                                    var route = animateRoute(
+                                      context: context,
+                                      page: SignIn(),
+                                    );
+                                    Navigator.push(context, route);
+                                  },
+                                ),
+                              ] else ...[
+                                TopButton(
+                                  icon: FontAwesomeIcons.user,
+                                  label: auth.currentUser!.name,
+                                  onTap: () {
+                                    // TODO: Navigate to profile
+                                  },
+                                ),
+                                TopButton(
+                                  icon: FontAwesomeIcons.signOutAlt,
+                                  label: "Sign Out",
+                                  onTap: () => auth.signOut(),
+                                ),
+                              ],
+                              TopButton(
+                                icon: FontAwesomeIcons.bars,
+                                label: "Menu",
+                                onTap: () {
+                                  _scaffoldKey.currentState?.openEndDrawer();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 10, left: 10),
-                      child: Container(
+                      child: SizedBox(
                         height: 230,
                         child: RichText(
                           textAlign: TextAlign.start,
-                          text: TextSpan(
+                          text: const TextSpan(
                             text: "Welcome to\n",
                             style: TextStyle(
                               fontSize: 50,
                               fontWeight: FontWeight.w100,
+                              color: Colors.white,
                             ),
                             children: [
                               TextSpan(
@@ -110,8 +149,8 @@ class Dashboard extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Column(
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Text(
                             "Search Device Owner",
                             style: TextStyle(color: Colors.white, fontSize: 10),
@@ -120,10 +159,11 @@ class Dashboard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.search,
@@ -131,14 +171,18 @@ class Dashboard extends StatelessWidget {
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: IconButton(
-                                    icon: Icon(FontAwesomeIcons.search),
-                                    onPressed: () {}),
+                                  icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+                                  onPressed: () {
+                                    // TODO: Implement search functionality
+                                  },
+                                ),
                               ),
                               focusColor: Colors.purple,
                               hoverColor: Colors.red,
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(39),
-                                  gapPadding: 30),
+                                borderRadius: BorderRadius.circular(39),
+                                gapPadding: 30,
+                              ),
                               fillColor: Colors.white.withOpacity(.4),
                               filled: true,
                               hintText: "Search",
@@ -147,60 +191,97 @@ class Dashboard extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Container(
+                          child: SizedBox(
                             height: 100,
                             child: Row(
                               children: <Widget>[
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.purple,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                      ),
                                       onPressed: () {
                                         var route = animateRoute(
                                           context: context,
                                           page: DeviceInfo(),
                                         );
-
                                         Navigator.push(context, route);
                                       },
-                                      child: Container(
+                                      child: const SizedBox(
                                         height: 50,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          "Device Info",
-                                          style: TextStyle(color: Colors.white),
+                                        child: Center(
+                                          child: Text(
+                                            "Device Info",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
                                         ),
                                       ),
-                                      color: Colors.purple,
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
                                       ),
                                       onPressed: () {
                                         scan(context);
                                       },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        child: Text("Scan QR code"),
+                                      child: const SizedBox(
                                         height: 50,
+                                        child: Center(
+                                          child: Text("Scan QR code"),
+                                        ),
                                       ),
-                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        )
+                        ),
+                        // Add device registration button if user is signed in
+                        if (auth.currentUser != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const DeviceRegistrationPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.add_circle),
+                                label: const Text(
+                                  "Register New Device",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -210,6 +291,8 @@ class Dashboard extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 
@@ -307,27 +390,79 @@ class Dashboard extends StatelessWidget {
                       );
                     },
                   ),
-                  TopButton(
-                    icon: FontAwesomeIcons.exchangeAlt,
-                    label: "Sell",
-                    lock: true,
-                    onTap: () {
-                      turnPage(2);
-                    },
-                  ),
-                  TopButton(
-                    icon: Icons.add,
-                    label: "New Device",
-                    lock: true,
-                    onTap: () {
-                      turnPage(3);
-                    },
-                  ),
+                          TopButton(
+                            icon: FontAwesomeIcons.exchangeAlt,
+                            label: "Sell",
+                            lock: true,
+                            onTap: () {
+                              turnPage(2);
+                            },
+                          ),
+                          TopButton(
+                            icon: Icons.add,
+                            label: "New Device",
+                            lock: true,
+                            onTap: () {
+                              turnPage(3);
+                            },
+                          ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Modern QR Scanner implementation using mobile_scanner
+class _QRScannerPage extends StatefulWidget {
+  @override
+  State<_QRScannerPage> createState() => _QRScannerPageState();
+}
+
+class _QRScannerPageState extends State<_QRScannerPage> {
+  bool isScanning = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan QR Code'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+      ),
+      body: MobileScanner(
+        onDetect: (capture) {
+          if (!isScanning) return;
+          
+          final List<Barcode> barcodes = capture.barcodes;
+          if (barcodes.isNotEmpty) {
+            final String? code = barcodes.first.rawValue;
+            setState(() {
+              isScanning = false;
+            });
+            
+            // Show result and go back
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Scanned: ${code ?? "Unknown"}'),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            );
+            
+            // Auto-return after 2 seconds
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                Navigator.of(context).pop();
+              }
+            });
+          }
+        },
       ),
     );
   }

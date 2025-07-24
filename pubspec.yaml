@@ -1,5 +1,5 @@
 name: gsec
-description: A new Flutter application.
+description: A modern Flutter application for device security, ownership proof, and peer-to-peer trading.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -11,54 +11,66 @@ description: A new Flutter application.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 2.0.0+1
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
-  flutter_sms: ^2.0.0+2
-  file_picker:
-  flutter_share: ^1.0.2+1
-  fa_stepper: ^0.0.2  
-  mobile_number: ^0.0.2
-  sim_info: ^0.1.1
-  qrscan: ^0.2.17  
-  country_pickers: ^1.2.0
-  settings_ui:
-  flutter_staggered_grid_view: #^0.3.0
-  country_code_picker: #^1.2.3
-  image_cropper: #^1.1.2
-  liquid_progress_indicator: #^0.3.2
-  awesome_dialog: #^0.1.0
-  square_in_app_payments: 
-  hidden_drawer_menu: #^1.1.2
-  bouncing_widget: #^1.2.0
-  cached_network_image: #^2.0.0-rc
-  admob_flutter: #^0.3.4
-  firebase_admob:
-  fluttertoast: #^3.1.2
-  serial_number: #0.1.0
-  cloud_firestore:
-  firebase_core: #0.4.0+9
-  firebase_storage: #3.0.6
-  firebase_auth: #0.14.0+4
-  flutter_signin_button: #^0.2.8
-  google_sign_in: 4.0.6
-  url_launcher:
-  qr_flutter: #^2.1.0
-  font_awesome_flutter:
-  provider:
-  barcode_scan: #1.0.0
-  image_picker: #0.6.1+4 #0.4.12+1
-  device_info: #0.3.0
-  shared_preferences: #0.4.3
   flutter:
     sdk: flutter
 
-  # Then following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
+  # UI Components
+  cupertino_icons: ^1.0.6
+  font_awesome_flutter: ^10.7.0
+  
+  # State Management
+  provider: ^6.1.2
+  
+  # Firebase
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.17.4
+  cloud_firestore: ^4.15.4
+  firebase_storage: ^11.6.5
+  
+  # Authentication & Social
+  google_sign_in: ^6.2.1
+  flutter_signin_button: ^2.0.0
+  
+  # Device & System Info
+  device_info_plus: ^10.1.0
+  sim_info: ^1.0.1
+  shared_preferences: ^2.2.2
+  
+  # Communication
+  flutter_sms: ^2.3.3
+  url_launcher: ^6.2.5
+  fluttertoast: ^8.2.4
+  
+  # Media & Files
+  image_picker: ^1.0.7
+  image_cropper: ^5.0.1
+  file_picker: ^6.1.1
+  cached_network_image: ^3.3.1
+  
+  # QR & Barcode
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^3.5.6
+  
+  # UI Enhancements
+  flutter_staggered_grid_view: ^0.7.0
+  settings_ui: ^2.0.2
+  country_code_picker: ^3.0.0
+  liquid_progress_indicator: ^0.4.0
+  awesome_dialog: ^3.2.0
+  bouncing_widget: ^2.0.0
+  
+  # Payments & Ads
+  google_mobile_ads: ^4.0.0
+  
+  # Share functionality
+  share_plus: ^7.2.2
 
 dev_dependencies:
   flutter_test:
