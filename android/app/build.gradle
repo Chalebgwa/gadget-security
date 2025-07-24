@@ -55,13 +55,72 @@ android {
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+        
+        // Production-ready configurations
+        resConfigs "en", "es", "fr", "de"  // Supported languages
+        
+        // Build configuration fields
+        buildConfigField "String", "APP_NAME", '"Gadget Security"'
+        buildConfigField "String", "VERSION_NAME", "\"${flutterVersionName}\""
+        buildConfigField "int", "VERSION_CODE", "${flutterVersionCode}"
+    }
+
+    signingConfigs {
+        debug {
+            // Debug signing configuration
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            // Production signing configuration - replace with your actual keystore
+            // storeFile file('keystore/release.keystore')
+            // storePassword System.getenv("KEYSTORE_PASSWORD")
+            // keyAlias System.getenv("KEY_ALIAS")
+            // keyPassword System.getenv("KEY_PASSWORD")
+            
+            // For now, using debug keys - CHANGE FOR PRODUCTION
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
     }
 
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
             signingConfig signingConfigs.debug
+            buildConfigField "String", "ENVIRONMENT", '"development"'
+            buildConfigField "boolean", "ENABLE_LOGGING", "true"
+            resValue "string", "app_name", "Gadget Security Debug"
+        }
+        
+        release {
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            signingConfig signingConfigs.release
+            buildConfigField "String", "ENVIRONMENT", '"production"'
+            buildConfigField "boolean", "ENABLE_LOGGING", "false"
+            resValue "string", "app_name", "Gadget Security"
+            
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        
+        staging {
+            applicationIdSuffix ".staging"
+            debuggable true
+            signingConfig signingConfigs.debug
+            buildConfigField "String", "ENVIRONMENT", '"staging"'
+            buildConfigField "boolean", "ENABLE_LOGGING", "true"
+            resValue "string", "app_name", "Gadget Security Staging"
+            
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
