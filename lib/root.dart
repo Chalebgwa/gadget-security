@@ -7,19 +7,19 @@ import 'package:provider/provider.dart';
 import 'fancy_drawer.dart';
 
 class Root extends StatefulWidget {
-  Root({Key key}) : super(key: key);
+  const Root({super.key});
 
-  _RootState createState() => _RootState();
+  @override
+  State<Root> createState() => _RootState();
 }
 
 class _RootState extends State<Root> {
-  Auth _auth;
+  Auth? _auth;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    //_auth.checkLoginStatus();
+    // Auth will be available through Provider context
   }
 
   @override
@@ -30,26 +30,25 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    var screen;
+    if (_auth == null) {
+      return const LoadingScreen();
+    }
 
-    
+    Widget screen;
 
-    setState(() {
-      
-    });
-
-    switch (_auth.state) {
-      case AuthState.SIGNED_OUT:
-        screen = FancyDrawer();
+    switch (_auth!.state) {
+      case AuthState.signedOut:
+        screen = const FancyDrawer();
         break;
-      case AuthState.LOADING:
-        screen = LoadingScreen();
+      case AuthState.loading:
+      case AuthState.safeLoading:
+        screen = const LoadingScreen();
         break;
-      case AuthState.SIGNED_IN:
-        screen = FancyDrawer();
+      case AuthState.signedIn:
+        screen = const FancyDrawer();
         break;
       default:
-        return FancyDrawer();
+        screen = const FancyDrawer();
     }
 
     return screen;
