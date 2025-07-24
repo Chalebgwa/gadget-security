@@ -41,5 +41,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to camera for scanning QR codes and taking photos of devices.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app may need access to microphone for device registration.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo library to select device images.</string>
 </dict>
 </plist>
