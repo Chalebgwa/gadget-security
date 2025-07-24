@@ -7,18 +7,22 @@ import 'package:gsec/pages/settings.dart';
 import 'package:gsec/widgets/dashcard.dart';
 import 'package:gsec/widgets/fancy_drawer.dart';
 import 'package:gsec/widgets/nm_box.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class Dashboard extends StatelessWidget {
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  Dashboard({Key key}) : super(key: key);
-  void turnPage(int page) {}
+  Dashboard({super.key});
+  void turnPage(int page) {
+    // TODO: Implement navigation to specific pages
+  }
 
   void scan(BuildContext context) async {
-    String value = await scanner.scan();
-    var snackbar = SnackBar(content: Text(value ?? "Error"));
-    Scaffold.of(context).showSnackBar(snackbar);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => _QRScannerPage(),
+      ),
+    );
   }
 
   @override
@@ -28,14 +32,17 @@ class Dashboard extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
-        endDrawer: FancyDrawer(),
+        endDrawer: const FancyDrawer(),
         backgroundColor: _topColor,
         body: Stack(
           children: <Widget>[
             Container(
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage("assets/back.jpg"), fit: BoxFit.fill)),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/back.jpg"), 
+                  fit: BoxFit.fill,
+                ),
+              ),
             ),
             Container(
               decoration: BoxDecoration(
@@ -49,8 +56,7 @@ class Dashboard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          //FlatButton(onPressed: (){}, child: Text("Premium",style: TextStyle(color: Colors.yellow),),),
-                          Expanded(child: Container()),
+                          const Expanded(child: SizedBox()),
                           TopButton(
                             icon: FontAwesomeIcons.lock,
                             label: "Sign In",
@@ -66,7 +72,7 @@ class Dashboard extends StatelessWidget {
                             icon: FontAwesomeIcons.bars,
                             label: "Menu",
                             onTap: () {
-                              _scaffoldKey.currentState.openEndDrawer();
+                              _scaffoldKey.currentState?.openEndDrawer();
                             },
                           ),
                         ],
@@ -76,15 +82,16 @@ class Dashboard extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 10, left: 10),
-                      child: Container(
+                      child: SizedBox(
                         height: 230,
                         child: RichText(
                           textAlign: TextAlign.start,
-                          text: TextSpan(
+                          text: const TextSpan(
                             text: "Welcome to\n",
                             style: TextStyle(
                               fontSize: 50,
                               fontWeight: FontWeight.w100,
+                              color: Colors.white,
                             ),
                             children: [
                               TextSpan(
@@ -110,8 +117,8 @@ class Dashboard extends StatelessWidget {
                   SliverToBoxAdapter(
                     child: Column(
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Text(
                             "Search Device Owner",
                             style: TextStyle(color: Colors.white, fontSize: 10),
@@ -120,10 +127,11 @@ class Dashboard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
                             textInputAction: TextInputAction.search,
@@ -131,14 +139,18 @@ class Dashboard extends StatelessWidget {
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: IconButton(
-                                    icon: Icon(FontAwesomeIcons.search),
-                                    onPressed: () {}),
+                                  icon: const Icon(FontAwesomeIcons.magnifyingGlass),
+                                  onPressed: () {
+                                    // TODO: Implement search functionality
+                                  },
+                                ),
                               ),
                               focusColor: Colors.purple,
                               hoverColor: Colors.red,
                               border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(39),
-                                  gapPadding: 30),
+                                borderRadius: BorderRadius.circular(39),
+                                gapPadding: 30,
+                              ),
                               fillColor: Colors.white.withOpacity(.4),
                               filled: true,
                               hintText: "Search",
@@ -147,53 +159,60 @@ class Dashboard extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Container(
+                          child: SizedBox(
                             height: 100,
                             child: Row(
                               children: <Widget>[
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.purple,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
+                                      ),
                                       onPressed: () {
                                         var route = animateRoute(
                                           context: context,
                                           page: DeviceInfo(),
                                         );
-
                                         Navigator.push(context, route);
                                       },
-                                      child: Container(
+                                      child: const SizedBox(
                                         height: 50,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          "Device Info",
-                                          style: TextStyle(color: Colors.white),
+                                        child: Center(
+                                          child: Text(
+                                            "Device Info",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
                                         ),
                                       ),
-                                      color: Colors.purple,
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: FlatButton(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                        ),
                                       ),
                                       onPressed: () {
                                         scan(context);
                                       },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        child: Text("Scan QR code"),
+                                      child: const SizedBox(
                                         height: 50,
+                                        child: Center(
+                                          child: Text("Scan QR code"),
+                                        ),
                                       ),
-                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -307,27 +326,79 @@ class Dashboard extends StatelessWidget {
                       );
                     },
                   ),
-                  TopButton(
-                    icon: FontAwesomeIcons.exchangeAlt,
-                    label: "Sell",
-                    lock: true,
-                    onTap: () {
-                      turnPage(2);
-                    },
-                  ),
-                  TopButton(
-                    icon: Icons.add,
-                    label: "New Device",
-                    lock: true,
-                    onTap: () {
-                      turnPage(3);
-                    },
-                  ),
+                          TopButton(
+                            icon: FontAwesomeIcons.exchangeAlt,
+                            label: "Sell",
+                            lock: true,
+                            onTap: () {
+                              turnPage(2);
+                            },
+                          ),
+                          TopButton(
+                            icon: Icons.add,
+                            label: "New Device",
+                            lock: true,
+                            onTap: () {
+                              turnPage(3);
+                            },
+                          ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Modern QR Scanner implementation using mobile_scanner
+class _QRScannerPage extends StatefulWidget {
+  @override
+  State<_QRScannerPage> createState() => _QRScannerPageState();
+}
+
+class _QRScannerPageState extends State<_QRScannerPage> {
+  bool isScanning = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan QR Code'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+      ),
+      body: MobileScanner(
+        onDetect: (capture) {
+          if (!isScanning) return;
+          
+          final List<Barcode> barcodes = capture.barcodes;
+          if (barcodes.isNotEmpty) {
+            final String? code = barcodes.first.rawValue;
+            setState(() {
+              isScanning = false;
+            });
+            
+            // Show result and go back
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Scanned: ${code ?? "Unknown"}'),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            );
+            
+            // Auto-return after 2 seconds
+            Future.delayed(const Duration(seconds: 2), () {
+              if (mounted) {
+                Navigator.of(context).pop();
+              }
+            });
+          }
+        },
       ),
     );
   }

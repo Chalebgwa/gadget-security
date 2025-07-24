@@ -5,22 +5,25 @@ import 'package:gsec/pages/page.dart';
 import 'package:gsec/widgets/nm_box.dart';
 
 class SignIn extends StatelessWidget {
-  SignIn({Key key}) : super(key: key);
+  SignIn({super.key});
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    TextStyle defaultStyle = TextStyle(
-        fontSize: 40, color: Colors.white, fontWeight: FontWeight.w100);
+    const TextStyle defaultStyle = TextStyle(
+      fontSize: 40, 
+      color: Colors.white, 
+      fontWeight: FontWeight.w100,
+    );
 
     return Scaffold(
       body: Stack(
         children: <Widget>[
           Container(
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/back.jpg"),
                 fit: BoxFit.fill,
@@ -32,7 +35,10 @@ class SignIn extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                colors: [Colors.black.withOpacity(.5), Colors.black.withOpacity(.8)],
+                colors: [
+                  Colors.black.withOpacity(.5), 
+                  Colors.black.withOpacity(.8),
+                ],
               ),
             ),
             child: Padding(
@@ -44,8 +50,10 @@ class SignIn extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       IconButton(
-                        icon: Icon(Icons.arrow_back),
-                        onPressed: () {},
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
                       )
                     ],
                   ),
@@ -81,11 +89,12 @@ class SignIn extends StatelessWidget {
                         height: 70,
                         width: MediaQuery.of(context).size.width,
                         child: TextField(
-                          style: TextStyle(
+                          controller: _emailController,
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(FontAwesomeIcons.userAlt),
+                          decoration: const InputDecoration(
+                            suffixIcon: Icon(FontAwesomeIcons.userAlt, color: Colors.white70),
                             border: InputBorder.none,
                             fillColor: Colors.lightBlueAccent,
                             labelText: 'Email',
@@ -99,12 +108,13 @@ class SignIn extends StatelessWidget {
                         height: 70,
                         width: MediaQuery.of(context).size.width,
                         child: TextField(
-                          style: TextStyle(
+                          controller: _passController,
+                          style: const TextStyle(
                             color: Colors.white,
                           ),
                           obscureText: true,
-                          decoration: InputDecoration(
-                            suffixIcon: Icon(FontAwesomeIcons.lock),
+                          decoration: const InputDecoration(
+                            suffixIcon: Icon(FontAwesomeIcons.lock, color: Colors.white70),
                             border: InputBorder.none,
                             fillColor: Colors.lightBlueAccent,
                             labelText: 'Password',
@@ -117,9 +127,11 @@ class SignIn extends StatelessWidget {
                     ],
                   ),
                   _buildLoginButton(context),
-                  FlatButton(
-                    onPressed: () {},
-                    child: Text(
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Implement forgot password functionality
+                    },
+                    child: const Text(
                       "Forgot your password?",
                       style: TextStyle(
                         color: Colors.white,
@@ -127,20 +139,20 @@ class SignIn extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: <Widget>[
-                      Text(
+                      const Text(
                         "Your first time here?",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w100,
                         ),
                       ),
-                      FlatButton(
+                      TextButton(
                         onPressed: () {
                           var route = animateRoute(
                             context: context,
@@ -148,7 +160,7 @@ class SignIn extends StatelessWidget {
                           );
                           Navigator.push(context, route);
                         },
-                        child: Text(
+                        child: const Text(
                           "Join Us",
                           style: TextStyle(
                             color: Colors.white,
@@ -167,17 +179,25 @@ class SignIn extends StatelessWidget {
     );
   }
 
-  Container _buildLoginButton(BuildContext context) {
+  Widget _buildLoginButton(BuildContext context) {
     return Container(
       alignment: Alignment.center,
       height: 50,
       width: MediaQuery.of(context).size.width,
-      decoration: nMbox.copyWith(boxShadow: [
-        
-      ]),
-      child: FlatButton(
-        onPressed: () {},
-        child: Text(
+      decoration: nMbox.copyWith(boxShadow: const []),
+      child: ElevatedButton(
+        onPressed: () {
+          // TODO: Implement login functionality
+          _handleLogin(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.purpleAccent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: const Text(
           'Sign In',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -186,6 +206,28 @@ class SignIn extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
+      ),
+    );
+  }
+
+  void _handleLogin(BuildContext context) {
+    final email = _emailController.text.trim();
+    final password = _passController.text.trim();
+    
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all fields'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    // TODO: Implement actual authentication
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Login functionality will be implemented'),
       ),
     );
   }
