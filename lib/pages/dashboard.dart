@@ -16,7 +16,7 @@ class Dashboard extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   Dashboard({super.key});
-  void turnPage(int page) {
+  void turnPage(BuildContext context, int page) {
     switch (page) {
       case 2:
         // TODO: Navigate to trading/selling page
@@ -395,7 +395,7 @@ class Dashboard extends StatelessWidget {
                             label: "Sell",
                             lock: true,
                             onTap: () {
-                              turnPage(2);
+                              turnPage(context, 2);
                             },
                           ),
                           TopButton(
@@ -403,7 +403,7 @@ class Dashboard extends StatelessWidget {
                             label: "New Device",
                             lock: true,
                             onTap: () {
-                              turnPage(3);
+                              turnPage(context, 3);
                             },
                           ),
                 ],

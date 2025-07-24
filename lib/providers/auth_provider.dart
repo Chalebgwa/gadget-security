@@ -9,12 +9,14 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter_sms/flutter_sms.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gsec/config/app_config.dart';
 import 'package:gsec/models/device.dart';
 
 import 'package:gsec/models/user.dart' as app_user;
 import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
+import 'package:gsec/utils/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthState {
@@ -74,6 +76,7 @@ class Auth extends BaseProvider {
 
   Future<void> checkLoginStatus() async {
     try {
+      AppLogger.debug('Checking login status');
       final prefs = await SharedPreferences.getInstance();
       final bool status = prefs.getBool("isLoggedIn") ?? false;
       
@@ -82,15 +85,17 @@ class Auth extends BaseProvider {
         if (data != null && data.isNotEmpty) {
           _currentUser = app_user.User.fromList(data);
           _state = AuthState.signedIn;
+          AppLogger.logAuth('User auto-signed in from persistent storage', userId: _currentUser?.id);
           notifyListeners();
           return;
         }
       }
       
       _state = AuthState.signedOut;
+      AppLogger.debug('No persistent login found');
       notifyListeners();
-    } catch (e) {
-      print('Error checking login status: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Error checking login status', error: e, stackTrace: stackTrace);
       _state = AuthState.signedOut;
       notifyListeners();
     }
@@ -104,6 +109,7 @@ class Auth extends BaseProvider {
 
   Future<bool> signInWithEmail(String email, String password) async {
     try {
+      AppLogger.logAuth('Sign in attempt', userId: email);
       //set the screen to show loading
       _state = AuthState.loading;
       notifyListeners();
@@ -128,6 +134,7 @@ class Auth extends BaseProvider {
             // set persistent login
             await setPersistentLogin(_currentUser!);
             _state = AuthState.signedIn;
+            AppLogger.logAuth('Sign in successful', userId: _currentUser?.id);
             notifyListeners();
             return true;
           }
@@ -135,23 +142,26 @@ class Auth extends BaseProvider {
       }
       
       _state = AuthState.signedOut;
+      AppLogger.warning('Sign in failed: User data not found');
       notifyListeners();
       return false;
-    } on auth.FirebaseAuthException catch (e) {
+    } on auth.FirebaseAuthException catch (e, stackTrace) {
+      AppLogger.logAuth('Firebase auth error during sign in', userId: email, error: e);
       _handleAuthError(e);
       return false;
-    } on PlatformException catch (e) {
-      print('Platform exception: ${e.message}');
+    } on PlatformException catch (e, stackTrace) {
+      AppLogger.error('Platform exception during sign in', error: e, stackTrace: stackTrace);
       _state = AuthState.signedOut;
       notifyListeners();
       return false;
-    } on TimeoutException {
+    } on TimeoutException catch (e, stackTrace) {
+      AppLogger.warning('Timeout during sign in', error: e);
       Fluttertoast.showToast(msg: "Bad internet connection");
       _state = AuthState.signedOut;
       notifyListeners();
       return false;
-    } catch (e) {
-      print('Unexpected error during sign in: $e');
+    } catch (e, stackTrace) {
+      AppLogger.error('Unexpected error during sign in', error: e, stackTrace: stackTrace);
       _state = AuthState.signedOut;
       notifyListeners();
       return false;
@@ -173,10 +183,17 @@ class Auth extends BaseProvider {
       case 'too-many-requests':
         message = 'Too many attempts. Please try again later.';
         break;
+      case 'network-request-failed':
+        message = 'Network error. Please check your connection.';
+        break;
+      case 'invalid-email':
+        message = 'Invalid email address.';
+        break;
       default:
         message = 'Authentication failed: ${e.message}';
     }
     
+    AppLogger.warning('Auth error handled: ${e.code}');
     Fluttertoast.showToast(msg: message);
     _state = AuthState.signedOut;
     notifyListeners();
@@ -601,12 +618,16 @@ class Auth extends BaseProvider {
 
   Future<void> alertSecurity(app_user.User peer) async {
     try {
+      AppLogger.logSecurity('Emergency alert triggered', userId: _currentUser?.id, isCritical: true);
+      
       await sendSMS(
         message: "I am in an emergency please contact the authorities\n${peer.toString()}",
-        recipients: ["+26777147912"], // This should be configurable
+        recipients: [AppConfig.securityAlertNumber],
       );
+      
+      AppLogger.info('Emergency SMS sent successfully');
     } catch (e) {
-      print('Error sending security alert: $e');
+      AppLogger.error('Error sending security alert', error: e);
       Fluttertoast.showToast(msg: "Failed to send security alert");
     }
   }

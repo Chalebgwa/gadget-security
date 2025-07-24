@@ -1,0 +1,101 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidFileSize(maxSizeInMB) {
+      return request.resource.size < maxSizeInMB * 1024 * 1024;
+    }
+    
+    function isImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isDocumentFile() {
+      return request.resource.contentType.matches('(application/pdf|image/.*)');
+    }
+    
+    // User profile images
+    match /profile_images/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) && 
+                      isImageFile() && 
+                      isValidFileSize(5); // 5MB limit
+      allow delete: if isOwner(userId);
+    }
+    
+    // Device images
+    match /device_images/{deviceId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+                      isImageFile() && 
+                      isValidFileSize(5) && // 5MB limit
+                      exists(/databases/(default)/documents/devices/$(deviceId)) &&
+                      get(/databases/(default)/documents/devices/$(deviceId)).data.ownerId == request.auth.uid;
+      allow delete: if isAuthenticated() && 
+                       exists(/databases/(default)/documents/devices/$(deviceId)) &&
+                       get(/databases/(default)/documents/devices/$(deviceId)).data.ownerId == request.auth.uid;
+    }
+    
+    // User documents (receipts, IDs, etc.)
+    match /user_documents/{userId}/{fileName} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && 
+                      isDocumentFile() && 
+                      isValidFileSize(10); // 10MB limit for documents
+      allow delete: if isOwner(userId);
+    }
+    
+    // Chat attachments
+    match /chat_attachments/{conversationId}/{fileName} {
+      allow read: if isAuthenticated() && 
+                     request.auth.uid in get(/databases/(default)/documents/conversations/$(conversationId)).data.participants;
+      allow write: if isAuthenticated() && 
+                      isValidFileSize(25) && // 25MB limit for chat files
+                      request.auth.uid in get(/databases/(default)/documents/conversations/$(conversationId)).data.participants;
+    }
+    
+    // QR codes (public read, owner write)
+    match /qr_codes/{deviceId}.png {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+                      isImageFile() && 
+                      isValidFileSize(1) && // 1MB limit for QR codes
+                      exists(/databases/(default)/documents/devices/$(deviceId)) &&
+                      get(/databases/(default)/documents/devices/$(deviceId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Public assets (read-only)
+    match /public/{allPaths=**} {
+      allow read: if true;
+    }
+    
+    // Admin uploads
+    match /admin/{allPaths=**} {
+      allow read, write: if isAuthenticated() && 
+                            request.auth.token.email in [
+                              'admin@gadgetsecurity.app',
+                              'support@gadgetsecurity.app'
+                            ];
+    }
+    
+    // Temporary uploads (auto-delete after 24 hours)
+    match /temp/{userId}/{fileName} {
+      allow read, write: if isOwner(userId) && 
+                            isValidFileSize(50); // 50MB limit for temp files
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
