@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gsec/pages/dashboard.dart';
 import 'package:gsec/provider/payments.dart';
 import 'package:gsec/provider/security.dart';
+import 'package:gsec/providers/auth_provider.dart';
+import 'package:gsec/providers/device_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -18,6 +20,12 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (BuildContext context) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => DeviceProvider(),
+        ),
         ChangeNotifierProvider(
           create: (BuildContext context) => Security(),
         ),
@@ -56,7 +64,25 @@ class Home extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system,
-      home: const Dashboard(),
+      home: Consumer<Auth>(
+        builder: (context, auth, child) {
+          // Show appropriate screen based on auth state
+          switch (auth.state) {
+            case AuthState.loading:
+            case AuthState.safeLoading:
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            case AuthState.signedIn:
+              return Dashboard();
+            case AuthState.signedOut:
+            default:
+              return Dashboard(); // Dashboard will show sign-in option
+          }
+        },
+      ),
     );
   }
 }

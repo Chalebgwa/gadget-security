@@ -4,17 +4,32 @@ import 'package:gsec/pages/authentication/sign_in.dart';
 import 'package:gsec/pages/device_info.dart';
 import 'package:gsec/pages/page.dart';
 import 'package:gsec/pages/settings.dart';
+import 'package:gsec/pages/forms/device_registration.dart';
 import 'package:gsec/widgets/dashcard.dart';
 import 'package:gsec/widgets/fancy_drawer.dart';
 import 'package:gsec/widgets/nm_box.dart';
+import 'package:gsec/providers/auth_provider.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
 
 class Dashboard extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   Dashboard({super.key});
   void turnPage(int page) {
-    // TODO: Implement navigation to specific pages
+    switch (page) {
+      case 2:
+        // TODO: Navigate to trading/selling page
+        break;
+      case 3:
+        // Navigate to device registration
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const DeviceRegistrationPage(),
+          ),
+        );
+        break;
+    }
   }
 
   void scan(BuildContext context) async {
@@ -29,56 +44,73 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     var _topColor = Colors.grey.shade200;
 
-    return SafeArea(
-      child: Scaffold(
-        key: _scaffoldKey,
-        endDrawer: const FancyDrawer(),
-        backgroundColor: _topColor,
-        body: Stack(
-          children: <Widget>[
-            Container(
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("assets/back.jpg"), 
-                  fit: BoxFit.fill,
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(.7),
-              ),
-              child: CustomScrollView(
-                slivers: <Widget>[
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          const Expanded(child: SizedBox()),
-                          TopButton(
-                            icon: FontAwesomeIcons.lock,
-                            label: "Sign In",
-                            onTap: () {
-                              var route = animateRoute(
-                                context: context,
-                                page: SignIn(),
-                              );
-                              Navigator.push(context, route);
-                            },
-                          ),
-                          TopButton(
-                            icon: FontAwesomeIcons.bars,
-                            label: "Menu",
-                            onTap: () {
-                              _scaffoldKey.currentState?.openEndDrawer();
-                            },
-                          ),
-                        ],
-                      ),
+    return Consumer<Auth>(
+      builder: (context, auth, child) {
+        return SafeArea(
+          child: Scaffold(
+            key: _scaffoldKey,
+            endDrawer: const FancyDrawer(),
+            backgroundColor: _topColor,
+            body: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/back.jpg"), 
+                      fit: BoxFit.fill,
                     ),
                   ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(.7),
+                  ),
+                  child: CustomScrollView(
+                    slivers: <Widget>[
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              const Expanded(child: SizedBox()),
+                              if (auth.currentUser == null) ...[
+                                TopButton(
+                                  icon: FontAwesomeIcons.lock,
+                                  label: "Sign In",
+                                  onTap: () {
+                                    var route = animateRoute(
+                                      context: context,
+                                      page: SignIn(),
+                                    );
+                                    Navigator.push(context, route);
+                                  },
+                                ),
+                              ] else ...[
+                                TopButton(
+                                  icon: FontAwesomeIcons.user,
+                                  label: auth.currentUser!.name,
+                                  onTap: () {
+                                    // TODO: Navigate to profile
+                                  },
+                                ),
+                                TopButton(
+                                  icon: FontAwesomeIcons.signOutAlt,
+                                  label: "Sign Out",
+                                  onTap: () => auth.signOut(),
+                                ),
+                              ],
+                              TopButton(
+                                icon: FontAwesomeIcons.bars,
+                                label: "Menu",
+                                onTap: () {
+                                  _scaffoldKey.currentState?.openEndDrawer();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.only(right: 10, left: 10),
@@ -219,7 +251,37 @@ class Dashboard extends StatelessWidget {
                               ],
                             ),
                           ),
-                        )
+                        ),
+                        // Add device registration button if user is signed in
+                        if (auth.currentUser != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const DeviceRegistrationPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.add_circle),
+                                label: const Text(
+                                  "Register New Device",
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -229,6 +291,8 @@ class Dashboard extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 
