@@ -16,7 +16,7 @@ class Device {
     String _name = map["name"] ?? '-';
     String _type = map["type"] ?? '-';
     String _imei = map['imei'] ?? "-";
-    bool _confirmed = bool.fromEnvironment(map['confirmed'] ?? "false");
+    bool _confirmed = map['confirmed'] == true || map['confirmed'] == 'true';
 
     return Device(
       _identifier,
@@ -32,12 +32,14 @@ class Device {
       5, (i) => Device("$i", "001", "device $i", type: '', imei: ''));
 
   static Map<String,dynamic> toMap(Device device) {
-    return <String, String>{
+    return <String, dynamic>{
       "identifier": device.identifier,
       "ownerId": device.ownerId,
       "name": device.name,
       'imei': device.imei,
-      "confirmed": device.confirmed.toString()
+      "type": device.type,
+      "confirmed": device.confirmed,
+      "createdAt": DateTime.now().toIso8601String(),
     };
   }
 }

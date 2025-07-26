@@ -7,8 +7,6 @@ import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/widgets/user_selector.dart';
 import 'package:provider/provider.dart';
 
-enum Action { NO, OK, ALERT }
-
 class DeviceCard extends StatefulWidget {
   final Device device;
 

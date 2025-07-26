@@ -8,13 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gsec/models/device.dart';
-
 import 'package:gsec/models/user.dart';
 import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
-import 'package:gsec/widgets/device_card.dart';
+import 'package:gsec/util/security_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum Action { NO, OK, ALERT }
 
 enum AuthState {
   SIGNED_IN,
@@ -81,11 +82,29 @@ class Auth extends BaseProvider {
   }
 
   Future<bool> signInWithEmail(String email, String password) async {
+    // Validate input
+    final validation = InputValidator.validateLogin(email: email, password: password);
+    if (!validation.isValid) {
+      Fluttertoast.showToast(msg: validation.error!);
+      return false;
+    }
+    
+    // Check rate limiting
+    final sanitizedEmail = SecurityUtils.sanitizeInput(email.trim().toLowerCase());
+    if (SecurityUtils.isRateLimited(sanitizedEmail)) {
+      Fluttertoast.showToast(msg: "Too many login attempts. Please try again later.");
+      return false;
+    }
+    
     _state = AuthState.LOADING;
     notifyListeners();
+    
     try {
+      // Record login attempt
+      SecurityUtils.recordLoginAttempt(sanitizedEmail);
+      
       final result = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.trim(),
+        email: sanitizedEmail,
         password: password,
       );
 
@@ -98,17 +117,44 @@ class Auth extends BaseProvider {
         if (snapshot.exists) {
           _currentUser = Client.fromMap(snapshot.data()!);
           await setPersistentLogin(_currentUser!);
+          
+          // Clear rate limiting on successful login
+          SecurityUtils.clearLoginAttempts(sanitizedEmail);
+          
           _state = AuthState.SIGNED_IN;
           notifyListeners();
           return true;
         }
       }
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (e) {
+      String errorMessage = "Login failed";
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = "No user found with this email";
+          break;
+        case 'wrong-password':
+          errorMessage = "Incorrect password";
+          break;
+        case 'user-disabled':
+          errorMessage = "This account has been disabled";
+          break;
+        case 'too-many-requests':
+          errorMessage = "Too many failed attempts. Please try again later";
+          break;
+        default:
+          errorMessage = "Login failed: ${e.message}";
+      }
+      Fluttertoast.showToast(msg: errorMessage);
       _state = AuthState.SIGNED_OUT;
       notifyListeners();
       return false;
     } on TimeoutException {
-      Fluttertoast.showToast(msg: "Bad internet");
+      Fluttertoast.showToast(msg: "Network timeout. Please check your connection.");
+      _state = AuthState.SIGNED_OUT;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      Fluttertoast.showToast(msg: "An unexpected error occurred");
       _state = AuthState.SIGNED_OUT;
       notifyListeners();
       return false;
@@ -180,25 +226,48 @@ class Auth extends BaseProvider {
     String phone,
     String gId,
   ) async {
+    // Validate input data
+    final validation = InputValidator.validateRegistration(
+      name: name,
+      surname: surname,
+      email: email,
+      password: password,
+      phone: phone,
+      governmentId: gId,
+    );
+    
+    if (!validation.isValid) {
+      Fluttertoast.showToast(msg: validation.error!);
+      return null;
+    }
+    
     _state = AuthState.LOADING;
     notifyListeners();
 
     try {
+      // Sanitize inputs
+      final sanitizedName = SecurityUtils.sanitizeInput(name);
+      final sanitizedSurname = SecurityUtils.sanitizeInput(surname);
+      final sanitizedEmail = SecurityUtils.sanitizeInput(email.trim().toLowerCase());
+      final sanitizedPhone = SecurityUtils.sanitizeInput(phone);
+      final sanitizedGId = SecurityUtils.sanitizeInput(gId);
+      
       UserCredential authResult = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+          .createUserWithEmailAndPassword(email: sanitizedEmail, password: password);
 
       if (authResult.user != null) {
         User user = authResult.user!;
-        await authenticateViaPhone(phone);
+        await authenticateViaPhone(sanitizedPhone);
 
+        // Store user data without password
         Map<String, String> _userInfo = {
-          "name": name,
-          "surname": surname,
-          "email": email,
-          "password": password,
-          "phone": phone,
-          "governmentId": gId,
-          "id": user.uid
+          "name": sanitizedName,
+          "surname": sanitizedSurname,
+          "email": sanitizedEmail,
+          "phone": sanitizedPhone,
+          "governmentId": sanitizedGId,
+          "id": user.uid,
+          "createdAt": DateTime.now().toIso8601String(),
         };
 
         await FirebaseFirestore.instance
@@ -211,7 +280,23 @@ class Auth extends BaseProvider {
         return user.uid;
       }
     } on FirebaseAuthException catch (e) {
-      print(e.message);
+      String errorMessage = "Registration failed";
+      switch (e.code) {
+        case 'weak-password':
+          errorMessage = "The password provided is too weak";
+          break;
+        case 'email-already-in-use':
+          errorMessage = "An account already exists with this email";
+          break;
+        case 'invalid-email':
+          errorMessage = "The email address is not valid";
+          break;
+        default:
+          errorMessage = "Registration failed: ${e.message}";
+      }
+      Fluttertoast.showToast(msg: errorMessage);
+    } catch (e) {
+      Fluttertoast.showToast(msg: "An unexpected error occurred during registration");
     }
 
     _state = AuthState.SIGNED_OUT;
@@ -352,25 +437,82 @@ class Auth extends BaseProvider {
   }
 
   Future<Action> confirmWithPin(String pin) async {
-    var doc = await firestore
-        .collection("security_info")
-        .doc("${currentUser!.id}")
-        .get();
-    var data = doc.data()!;
-    if (pin == data["safe"]) {
-      return Action.OK;
-    } else if (pin == data["alert"]) {
-      return Action.ALERT;
-    } else {
+    try {
+      var doc = await firestore
+          .collection("security_info")
+          .doc("${currentUser!.id}")
+          .get();
+      
+      if (!doc.exists) {
+        return Action.NO;
+      }
+      
+      var data = doc.data()!;
+      final salt = data["salt"] ?? "";
+      final safeHash = data["safeHash"] ?? "";
+      final alertHash = data["alertHash"] ?? "";
+      
+      // Hash the entered PIN with the stored salt
+      final hashedPin = SecurityUtils.hashPassword(pin, salt);
+      
+      if (hashedPin == safeHash) {
+        return Action.OK;
+      } else if (hashedPin == alertHash) {
+        return Action.ALERT;
+      } else {
+        return Action.NO;
+      }
+    } catch (e) {
+      print("Error confirming PIN: $e");
       return Action.NO;
     }
   }
 
+  /// Sets up security PINs with proper hashing
+  Future<void> setupSecurityPins(String safePin, String alertPin) async {
+    try {
+      _state = AuthState.LOADING;
+      notifyListeners();
+      
+      // Generate a unique salt for this user
+      final salt = SecurityUtils.generateSalt();
+      
+      // Hash both PINs with the salt
+      final safeHash = SecurityUtils.hashPassword(safePin, salt);
+      final alertHash = SecurityUtils.hashPassword(alertPin, salt);
+      
+      final securityData = {
+        "salt": salt,
+        "safeHash": safeHash,
+        "alertHash": alertHash,
+        "createdAt": DateTime.now().toIso8601String(),
+        "lastUpdated": DateTime.now().toIso8601String(),
+      };
+      
+      await firestore
+          .collection("security_info")
+          .doc(currentUser!.id)
+          .set(securityData);
+      
+      Fluttertoast.showToast(msg: "Security PINs set up successfully");
+      
+      _state = AuthState.SIGNED_IN;
+      notifyListeners();
+    } catch (e) {
+      Fluttertoast.showToast(msg: "Failed to set up security PINs");
+      _state = AuthState.SIGNED_IN;
+      notifyListeners();
+    }
+  }
+
   void alertSecurity(User peer) {
+    // Get emergency contact from user preferences or default
+    final emergencyContact = preferences?.getString("emergency_contact") ?? "+26777147912";
+    
     sendSMS(
-      message: "I am in an emergency please contact the authorities\n " +
-          peer.toString(),
-      recipients: ["+26777147912"],
+      message: "EMERGENCY ALERT: User ${currentUser?.name} ${currentUser?.surname} is in danger. " +
+          "Location assistance needed. Contact details: ${peer.toString()}",
+      recipients: [emergencyContact],
     );
   }
   
