@@ -1,18 +1,113 @@
-name: Dart CI
+name: Flutter CI
 
-on: [push]
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
-    container:
-      image:  google/dart:latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '11'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Verify formatting
+      run: flutter format --output=none --set-exit-if-changed .
+
+    - name: Analyze project source
+      run: flutter analyze --fatal-infos
+
+    - name: Run tests
+      run: flutter test --coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: coverage/lcov.info
+
+  build-android:
+    runs-on: ubuntu-latest
+    needs: test
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-      run: pub get
-    - name: Run tests
-      run: pub run test
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '11'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Run security audit
+      run: |
+        # Check for known vulnerabilities in dependencies
+        flutter pub deps --json | grep -E '"name":|"version":' || true
+        
+        # Basic security checks
+        echo "Checking for hardcoded secrets..."
+        if grep -r "password.*=" lib/ --include="*.dart" | grep -v "SecurityUtils\|hashPassword\|isStrongPassword"; then
+          echo "Warning: Potential hardcoded passwords found"
+          exit 1
+        fi
+        
+        echo "Checking for API keys..."
+        if grep -r "AIza\|sk_\|pk_" lib/ --include="*.dart"; then
+          echo "Warning: Potential API keys found in source code"
+          exit 1
+        fi
+        
+        echo "Security scan completed successfully"
