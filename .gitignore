@@ -24,10 +24,20 @@
 **/doc/api/
 .dart_tool/
 .flutter-plugins
+.flutter-plugins-dependencies
 .packages
 .pub-cache/
 .pub/
 /build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
 
 # Android related
 **/android/**/gradle-wrapper.jar
@@ -37,6 +47,9 @@
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+*.keystore
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -64,9 +77,30 @@
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+# Coverage
+coverage/
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# Security and Environment
+.env
+.env.local
+.env.production
+secrets/
+*.pem
+*.key
+firebase-debug.log
+.firebase/
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+
+# Testing
+/test/coverage/
+/coverage/

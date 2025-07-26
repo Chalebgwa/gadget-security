@@ -13,8 +13,9 @@ import 'package:gsec/providers/base_provider.dart';
 import 'package:gsec/providers/device_provider.dart';
 import 'package:gsec/providers/user_provider.dart';
 import 'package:gsec/util/security_utils.dart';
-import 'package:gsec/widgets/device_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum Action { NO, OK, ALERT }
 
 enum AuthState {
   SIGNED_IN,

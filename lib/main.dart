@@ -17,7 +17,6 @@ import 'package:gsec/views/profile/edit_profile.dart';
 import 'package:gsec/views/profile/profile.dart';
 import 'package:gsec/views/settings.dart';
 import 'package:gsec/views/util/scanner.dart';
-import 'package:positioned_tap_detector/positioned_tap_detector.dart';
 import "package:provider/provider.dart";
 
 void main() {
